@@ -33,6 +33,9 @@ public class KeyboardInputs implements KeyListener{
 		case OVERWORLD:
 			gamePanel.getGame().getOverworld().keyReleased(e);
 			break;
+		case BATTLE:
+			gamePanel.getGame().getBattle().keyReleased(e);
+			break;
 		default:
 			break;
 		
@@ -49,6 +52,9 @@ public class KeyboardInputs implements KeyListener{
 			break;
 		case OVERWORLD:
 			gamePanel.getGame().getOverworld().keyPressed(e);
+			break;
+		case BATTLE:
+			gamePanel.getGame().getBattle().keyPressed(e);
 			break;
 		default:
 			break;

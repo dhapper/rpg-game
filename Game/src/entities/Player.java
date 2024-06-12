@@ -5,78 +5,111 @@ import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.CanMoveHere;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import utilz.LoadSave;
+import graphics.GraphicsHelp;
 
 public class Player extends Entity {
 	
-	private BufferedImage[][] animations;
-	private int aniTick, aniIndex;//, aniSpeed = 30;
+	//private BufferedImage[][] animations;
+	private int aniTick, aniIndex, currFrame;
 	private int playerAction = IDLE;
 	private boolean moving = false;
 	private boolean left, up, right, down;
-	//private float playerSpeed = 2f * Game.SCALE;
-	private int[][] locationData;
+	private ArrayList<int[][]> layersData = new ArrayList<int[][]>();
+
+	private int prevAni = -1;
+	private boolean facingRight = true, facingLeft = false, facingForward = false, facingBackward = false;
 	
-	private int prevAni = 99;
-	
-	private boolean facingRight = true;
+	//private int health = 50;
+	//private int strength = 10;
+	//private int speed = 10;
 	
 	public Player(float x, float y, int width, int height) {
 		super(x, y, width, height);
 		loadAnimations();
-		initHitbox(x, y, HITBOX_WIDTH, HITBOX_HEIGHT);//(int) (12 * Game.SCALE * playerScale), (int) (playerHeight / 4));
+		initHitbox(x, y, HITBOX_WIDTH, HITBOX_HEIGHT);
+		
+		this.name = "dhaarsh";
+		this.health = 50;
+		this.strength = 20;
+		this.speed = 10;
 	}
 
 	public void update() {
 		updatePos();
 		updateAniTick();
-		setAnimation();
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
 		
-		if(facingRight)
-			g.drawImage(animations[playerAction][aniIndex], (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+		if(!moving) {
+			if(facingRight)
+				g.drawImage(animations[0][0], (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
 					PLAYER_WIDTH, PLAYER_HEIGHT, null);
-		else	
-			g.drawImage(mirrorImage(animations[playerAction][aniIndex]), (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+			if(facingLeft)
+				g.drawImage(GraphicsHelp.MirrorImage(animations[0][0]), (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+						PLAYER_WIDTH, PLAYER_HEIGHT, null);
+			if(facingForward)
+				g.drawImage(animations[0][1], (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+						PLAYER_WIDTH, PLAYER_HEIGHT, null);
+			if(facingBackward)
+				g.drawImage(animations[0][2], (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+						PLAYER_WIDTH, PLAYER_HEIGHT, null);
+		}
+		
+		if(moving) {
+			if(facingRight)
+				g.drawImage(animations[playerAction][currFrame], (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
 					PLAYER_WIDTH, PLAYER_HEIGHT, null);
+			if(facingLeft)
+				g.drawImage(GraphicsHelp.MirrorImage(animations[playerAction][currFrame]), (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+						PLAYER_WIDTH, PLAYER_HEIGHT, null);
+			if(facingForward)
+				g.drawImage(animations[playerAction][currFrame], (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+						PLAYER_WIDTH, PLAYER_HEIGHT, null);
+			if(facingBackward)
+				g.drawImage(animations[playerAction][currFrame], (int) (hitbox.x - X_DRAW_OFFSET) - xOffset, (int) (hitbox.y - Y_DRAW_OFFSET) - yOffset,
+						PLAYER_WIDTH, PLAYER_HEIGHT, null);
+		}
 		
 		//drawHitbox(g);
+		
 	}
 	
 	private void updateAniTick() {
-		aniTick++;
-		if(aniTick >= GetFrameDuration(playerAction)) {
-			aniTick = 0;
-			aniIndex++;
-			if(aniIndex >= GetSpriteAmount(playerAction))
-				aniIndex  = 0;
-		}
-		
-		// added this
-		if (playerAction != prevAni)
-			aniIndex = 0;
-		
-		prevAni = playerAction;
-		
+	    // Reset aniIndex when playerAction changes
+	    if (playerAction != prevAni) {
+	        aniIndex = 0;
+	        prevAni = playerAction;
+	    }
+	    
+	    aniTick++;
+	    
+	    int[][] aniData = GetAnimationData(playerAction);
+	    int[] frames = aniData[0];
+	    int[] durations = aniData[1];
+	    
+	    if (aniTick >= durations[aniIndex]) {
+	        aniTick = 0;
+	        aniIndex++;
+	        
+	        if (aniIndex >= frames.length) {
+	            aniIndex = 0;
+	        }
+	        
+	        currFrame = frames[aniIndex];
+	    }
 	}
 
-	private void setAnimation() {
-		if(moving)
-			playerAction = WALKING;
-		else
-			playerAction = IDLE;
-		
-	}
 	
 	private void updatePos() {
 		
 		moving = false;
+		playerAction = IDLE;
+		float xSpeed = 0, ySpeed = 0;
 		
 		if(left && right || up & down)
 			return;
@@ -84,59 +117,70 @@ public class Player extends Entity {
 		if(!left && !right && !up && !down)
 			return;
 		
-		float xSpeed = 0, ySpeed = 0;
-		
 		if(left && !right) {
 			xSpeed = -PLAYER_SPEED;
-			facingRight = false;
+			setFacingBoolsFalse();
+			facingLeft = true;
+			playerAction = WALKING_SIDEWAYS;
 		}else if(!left && right) {
 			xSpeed = PLAYER_SPEED;
+			setFacingBoolsFalse();
 			facingRight = true;
+			playerAction = WALKING_SIDEWAYS;
 		}
 		
 		if(up && !down) {
 			ySpeed = -PLAYER_SPEED;
+			setFacingBoolsFalse();
+			facingBackward = true;
+			playerAction = WALKING_AWAY;
 		}else if(!up && down) {
 			ySpeed = PLAYER_SPEED;
+			setFacingBoolsFalse();
+			facingForward = true;
+			playerAction = WALKING_TOWARDS;
 		}
 		
-//		if(CanMoveHere(x + xSpeed, y + ySpeed, width, height, locationData)) {
-//			this.x += xSpeed;
-//			this.y += ySpeed;
-//			moving = true;
-//		}
-		
-		if(CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, locationData)) {
+		if(CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, layersData)) {
 			hitbox.x += xSpeed;
 			hitbox.y += ySpeed;
 			moving = true;
 		}
 	}
 	
+	// maybe entity?
+	private void setFacingBoolsFalse() {
+		facingRight = false;
+		facingLeft = false;
+		facingForward = false;
+		facingBackward = false;
+	}
+	
 	private void loadAnimations() {
-		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
+		BufferedImage img = LoadSave.GetResource(LoadSave.SKINTONE_0);
 		
-		animations = new BufferedImage[5][6];
+		animations = new BufferedImage[8][8];
 		for(int j = 0; j < animations.length; j++)
-			for(int i = 0; i < animations[j].length; i++)
-				animations[j][i] = img.getSubimage(i * 20, j * 32, 20, 32);
-			
+			for(int i = 0; i < animations[j].length; i++) {
+				animations[j][i] = img.getSubimage(i * 64, j * 64, 64, 64);
+				
+				//keeping player animations consistently facing right
+				if(j == 4 || j == 5)
+					animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
+			}
 	}
 	
-	public void loadLocationData(int[][] locationData) {
-		this.locationData = locationData;
+//	public BufferedImage[][] getAnimations() {
+//		return animations;
+//	}
+	
+	
+	public void addLocationData(String fileName) {
+		layersData.add(LoadSave.GetLocationData(fileName));
 	}
 	
-	public BufferedImage mirrorImage(BufferedImage img) {
-		int width = img.getWidth();
-        int height = img.getHeight();
-        BufferedImage mirroredImage = new BufferedImage(width, height, img.getType());
-        AffineTransform transform = AffineTransform.getScaleInstance(-1, 1);
-        transform.translate(-width, 0);
-        Graphics2D g = mirroredImage.createGraphics();
-        g.drawImage(img, transform, null);
-        g.dispose();
-        return mirroredImage;
+	public void clearLocationData() {
+		layersData.clear();
 	}
 	
 	public void resetDirBooleans() {
@@ -179,6 +223,8 @@ public class Player extends Entity {
 		this.down = down;
 	}
 	
-	
+//	public int[] getStats() {
+//		return new int[] {health, strength, speed};
+//	}
 	
 }

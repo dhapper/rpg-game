@@ -19,7 +19,7 @@ public class Animation {
 		this.numOfFrames = numOfFrames;
 		this.animation = new BufferedImage[numOfFrames];
 		
-		BufferedImage spriteSheet = LoadSave.GetSpriteAtlas(fileName);
+		BufferedImage spriteSheet = LoadSave.GetResource(fileName);
 		
 		for(int i = 0; i < numOfFrames; i++) {
 			this.animation[i] = spriteSheet.getSubimage(i * 32, rowIndex * 32,  32, 32);

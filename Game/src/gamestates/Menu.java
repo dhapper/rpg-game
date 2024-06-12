@@ -1,11 +1,14 @@
 package gamestates;
 
 import java.awt.Graphics;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import main.Game;
 import ui.MenuButton;
+
+import static utilz.Constants.UI.MenuButton.*;
 
 public class Menu extends State implements Statemethods{
 
@@ -17,7 +20,7 @@ public class Menu extends State implements Statemethods{
 	}
 
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 2, (int) (120 * Game.SCALE), 0, GameState.OVERWORLD);
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - B_WIDTH / 2, (int) (100 * Game.SCALE), 0, GameState.OVERWORLD);
 		
 	}
 

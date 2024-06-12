@@ -8,12 +8,37 @@ public class Location {
 
 	private ArrayList<int[][]> layers;
 	
+	private int locationIndex;
 	
-	public Location() {
+	public Location(int locationIndex) {
+		
+		this.locationIndex = locationIndex;
+		
 		this.layers = new ArrayList<>();
-		this.addLocationLayer(LoadSave.LOCATION_ONE_DATA_LAYER_1);
-		this.addLocationLayer(LoadSave.LOCATION_ONE_DATA_LAYER_2);
-		this.addLocationLayer(LoadSave.LOCATION_ONE_DATA_LAYER_3);
+		
+		String layerOrder[] = {"W_S", "C_S", "C_A", "W_A"};
+		
+		for(String order : layerOrder)
+			for(String layer : LoadSave.LAYER_MAPS) {
+				if(layer.contains("Lo"+locationIndex) && layer.contains(order))
+					this.addLocationLayer(layer);
+			}
+		
+//		if(locationIndex == 0) {
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo0_W_S_La1);
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo0_W_S_La2);
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo0_C_S_La1);
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo0_C_A_La1);
+//		}
+//		
+//		if(locationIndex == 1) {
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo1_W_S_La1);
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo1_W_S_La2);
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo1_C_S_La1);
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo1_C_A_La1);
+//			this.addLocationLayer(LoadSave.LAYER_MAP_Lo1_W_A_La1);
+//		}
+		
 	}
 	
 	public void addLocationLayer(String layerName) {
@@ -31,5 +56,10 @@ public class Location {
 	public int[][] getLayerData(int layerIndex) {
 		return layers.get(layerIndex);
 	}
+	
+	public int getLocationIndex() {
+		return locationIndex;
+	}
+	
 
 }

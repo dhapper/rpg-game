@@ -3,12 +3,18 @@ package entities;
 import java.awt.Color; 
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 public abstract class Entity {
 
 	protected float x, y;
 	protected int width, height;
 	protected Rectangle2D.Float hitbox;
+	
+	protected String name;
+	protected int health, strength, speed;
+	
+	protected BufferedImage[][] animations;
 	
 	public Entity(float x, float y, int width, int height) {
 		this.x = x;
@@ -32,6 +38,18 @@ public abstract class Entity {
 	
 	public Rectangle2D.Float getHitbox() {
 		return hitbox;
+	}
+	
+	public int[] getStats() {
+		return new int[] {health, strength, speed};
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public BufferedImage[][] getAnimations() {
+		return animations;
 	}
 	
 }

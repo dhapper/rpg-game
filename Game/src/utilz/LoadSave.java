@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -13,15 +14,45 @@ public class LoadSave {
 	public static final String PLAYER_ATLAS = "player.png";
 	public static final String MENU_BUTTONS = "menu buttons.png";
 	
-	public static final String LOCATION_ONE_DATA_LAYER_1 = "LAYER 1.png";
-	public static final String LOCATION_ONE_DATA_LAYER_2 = "LAYER 2.png";
-	public static final String LOCATION_ONE_DATA_LAYER_3 = "LAYER 3.png";
-
-	public static final String LOCATION_ATLAS_LAYER_1 = "SPRITES - TILES 1.png";
-	public static final String LOCATION_ATLAS_LAYER_2 = "SPRITES - TILES 2.png";
-	public static final String LOCATION_ATLAS_LAYER_3 = "SPRITES - ANIMATED.png";
+	public static final String SKINTONE_0 = "SKINTONE_0.png";
+	public static final String SKINTONE_1 = "SKINTONE_1.png";
 	
-	public static BufferedImage GetSpriteAtlas(String fileName) {
+	public static final String LAYER_MAP_Lo0_W_S_La1 = "LAYER_MAP_Lo0_W_S_La1.png";
+	public static final String LAYER_MAP_Lo0_W_S_La2 = "LAYER_MAP_Lo0_W_S_La2.png";
+	public static final String LAYER_MAP_Lo0_C_S_La1 = "LAYER_MAP_Lo0_C_S_La1.png";
+	public static final String LAYER_MAP_Lo0_C_A_La1 = "LAYER_MAP_Lo0_C_A_La1.png";
+	public static final String LAYER_MAP_Lo0_W_A_La1 = "LAYER_MAP_Lo0_W_A_La1.png";
+	
+	public static final String LAYER_MAP_Lo1_W_S_La1 = "LAYER_MAP_Lo1_W_S_La1.png";
+	public static final String LAYER_MAP_Lo1_W_S_La2 = "LAYER_MAP_Lo1_W_S_La2.png";
+	public static final String LAYER_MAP_Lo1_C_S_La1 = "LAYER_MAP_Lo1_C_S_La1.png";
+	public static final String LAYER_MAP_Lo1_C_A_La1 = "LAYER_MAP_Lo1_C_A_La1.png";
+	public static final String LAYER_MAP_Lo1_W_A_La1 = "LAYER_MAP_Lo1_W_A_La1.png";
+	
+	public static final ArrayList<String> LAYER_MAPS = new ArrayList<String>();
+	
+	static {
+        // Add layer map strings to LAYER_MAPS
+        LAYER_MAPS.add(LAYER_MAP_Lo0_W_S_La1);
+        LAYER_MAPS.add(LAYER_MAP_Lo0_W_S_La2);
+        LAYER_MAPS.add(LAYER_MAP_Lo0_C_S_La1);
+        LAYER_MAPS.add(LAYER_MAP_Lo0_C_A_La1);
+        LAYER_MAPS.add(LAYER_MAP_Lo0_W_A_La1);
+
+        LAYER_MAPS.add(LAYER_MAP_Lo1_W_S_La1);
+        LAYER_MAPS.add(LAYER_MAP_Lo1_W_S_La2);
+        LAYER_MAPS.add(LAYER_MAP_Lo1_C_S_La1);
+        LAYER_MAPS.add(LAYER_MAP_Lo1_C_A_La1);
+        LAYER_MAPS.add(LAYER_MAP_Lo1_W_A_La1);
+    }
+
+	public static final String SPRITESHEET_W_S_La1 = "SPRITESHEET_W_S_La1.png";
+	public static final String SPRITESHEET_W_S_La2 = "SPRITESHEET_W_S_La2.png";
+	public static final String SPRITESHEET_C_S_La1 = "SPRITESHEET_C_S_La1.png";
+	public static final String SPRITESHEET_C_A_La1 = "SPRITESHEET_C_A_La1.png";
+	public static final String SPRITESHEET_W_A_La1 = "SPRITESHEET_W_A_La1.png";
+	
+	public static BufferedImage GetResource(String fileName) {
 		BufferedImage img = null;
 		InputStream is = LoadSave.class.getResourceAsStream("/" + fileName);
 		try {
@@ -39,10 +70,15 @@ public class LoadSave {
 		return img;
 	}
 	
-	public static int[][] GetLocationData(String LOCATION_DATA){
+	public static BufferedImage GetSprite(BufferedImage spriteSheet, int xIndex, int yIndex, int spriteWidth, int spriteHeight) {
+		BufferedImage sprite = spriteSheet.getSubimage(xIndex * spriteWidth, yIndex * spriteHeight, spriteWidth, spriteHeight);
+		return sprite;
+	}
+	
+	public static int[][] GetLocationData(String data){
 		int numOfSprites = 25;
 		
-		BufferedImage img = GetSpriteAtlas(LOCATION_DATA);
+		BufferedImage img = GetResource(data);
 		int [][] locationData = new int[img.getHeight()][img.getWidth()];
 		
 		for(int j = 0 ; j < img.getHeight(); j ++) {

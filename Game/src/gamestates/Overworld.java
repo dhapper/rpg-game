@@ -3,6 +3,7 @@ package gamestates;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.LinkedList;
 
 import entities.Player;
 import locations.LocationManager;
@@ -15,31 +16,53 @@ public class Overworld extends State implements Statemethods{
 	private LocationManager locationManager;
 	
 	private int xLocationOffset, yLocationOffset;
-	
 	private int leftBorder = (int) (0.4 * Game.GAME_WIDTH);
 	private int rightBorder = (int) (0.6 * Game.GAME_WIDTH);
-	
 	private int upperBorder = (int) (0.4 * Game.GAME_HEIGHT);
 	private int lowerBorder = (int) (0.6 * Game.GAME_HEIGHT);
-	
-	private int locationTilesWide = LoadSave.GetLocationData(LoadSave.LOCATION_ONE_DATA_LAYER_1)[0].length;
-	private int locationTilesHigh = LoadSave.GetLocationData(LoadSave.LOCATION_ONE_DATA_LAYER_1).length;
-	
+	private int locationTilesWide = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1)[0].length;
+	private int locationTilesHigh = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1).length;
 	private int maxTilesOffsetX = locationTilesWide - Game.TILES_IN_WIDTH;
 	private int maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
 	private int maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
 	private int maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
 	
+	private LinkedList<Character> keyOrder = new LinkedList<>();
+	private boolean upPressed, downPressed, leftPressed, rightPressed;
 
 	public Overworld(Game game) {
 		super(game);
 		initClasses();
+		
+		loadLocation(1);
 	}
 	
+	private void loadLocation(int locationIndex) {
+		// update visuals 
+		locationManager.setCurrentLocation(locationIndex);
+		for(int index = 0; index < locationManager.getLocations().size(); index++) {
+			if(index == locationIndex) {
+				player.clearLocationData();
+				for(String layer: LoadSave.LAYER_MAPS)
+					if(layer.contains("Lo"+index+"_") && layer.contains("_C_")) {
+						// update player collisions
+						player.addLocationData(layer);
+						// update map size
+						locationTilesWide = LoadSave.GetLocationData(layer)[0].length;
+						locationTilesHigh = LoadSave.GetLocationData(layer).length;
+					}
+				maxTilesOffsetX = locationTilesWide - Game.TILES_IN_WIDTH;
+				maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
+				maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
+				maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
+			}
+		}
+	}
+
 	private void initClasses() {
-		locationManager = new LocationManager(game);
-		player = new Player(400, 400, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
-		player.loadLocationData(locationManager.getCurrentLocation().getLayerData(0));	//locationManager.getCurrentLocation().getLocationData()
+		this.locationManager = new LocationManager(game);
+		player = new Player(100, 100, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
+		//player.loadLocationData(locationManager.getCurrentLocation().getLayerData(0));	idk what this does, might be important
 	}
 
 	@Override
@@ -48,6 +71,7 @@ public class Overworld extends State implements Statemethods{
 		player.update();
 		checkCloseToBorder();
 		
+		updatePlayerMovement();
 	}
 
 	private void checkCloseToBorder() {
@@ -112,21 +136,79 @@ public class Overworld extends State implements Statemethods{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private void updatePlayerMovement() {
+	    // Reset all movement flags
+	    player.setUp(false);
+	    player.setDown(false);
+	    player.setLeft(false);
+	    player.setRight(false);
 
+	    // Apply movement based on the highest priority key pressed
+ 		for (char key : keyOrder) {
+ 			switch (key) {
+ 				case 'W':
+ 					if (upPressed) {
+ 						player.setUp(true);
+ 						return;
+ 					}
+ 					break;
+ 				case 'A':
+ 					if (leftPressed) {
+ 						player.setLeft(true);
+ 						return;
+ 					}
+ 					break;
+ 				case 'S':
+ 					if (downPressed) {
+ 						player.setDown(true);
+ 						return;
+ 					}
+ 					break;
+ 				case 'D':
+ 					if (rightPressed) {
+ 						player.setRight(true);
+ 						return;
+ 					}
+ 					break;
+ 			}
+ 		}
+	}
+	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		switch(e.getKeyCode()) {
 		case KeyEvent.VK_W:
-			player.setUp(true);
+			upPressed = true;
+			keyOrder.remove(Character.valueOf('W'));
+			keyOrder.addFirst('W');
 			break;
 		case KeyEvent.VK_A:
-			player.setLeft(true);
+			leftPressed = true;
+			keyOrder.remove(Character.valueOf('A'));
+			keyOrder.addFirst('A');
 			break;
 		case KeyEvent.VK_S:
-			player.setDown(true);
+			downPressed = true;
+			keyOrder.remove(Character.valueOf('S'));
+			keyOrder.addFirst('S');
 			break;
 		case KeyEvent.VK_D:
-			player.setRight(true);
+			rightPressed = true;
+			keyOrder.remove(Character.valueOf('D'));
+			keyOrder.addFirst('D');
+			break;
+			
+		case KeyEvent.VK_Q:
+			if(locationManager.getCurrentLocation().getLocationIndex() == locationManager.getLocations().size() - 1)
+				loadLocation(0);
+			else
+				loadLocation(locationManager.getCurrentLocation().getLocationIndex() + 1);
+			break;
+		
+		case KeyEvent.VK_B:
+			game.createBattle();
+			GameState.state = GameState.BATTLE;
 			break;
 			
 		case KeyEvent.VK_ENTER:
@@ -138,20 +220,24 @@ public class Overworld extends State implements Statemethods{
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		switch(e.getKeyCode()) {
+		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
-			player.setUp(false);
+			upPressed = false;
+			keyOrder.remove(Character.valueOf('W'));
 			break;
 		case KeyEvent.VK_A:
-			player.setLeft(false);
+			leftPressed = false;
+			keyOrder.remove(Character.valueOf('A'));
 			break;
 		case KeyEvent.VK_S:
-			player.setDown(false);
+			downPressed = false;
+			keyOrder.remove(Character.valueOf('S'));
 			break;
 		case KeyEvent.VK_D:
-			player.setRight(false);
+			rightPressed = false;
+			keyOrder.remove(Character.valueOf('D'));
 			break;
-		}
+	}
 		
 	}
 	
@@ -162,5 +248,9 @@ public class Overworld extends State implements Statemethods{
 	
 	public Player getPlayer() {
 		return player;
+	}
+	
+	public LocationManager getLocationManager() {
+		return locationManager;
 	}
 }
