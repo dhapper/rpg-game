@@ -2,8 +2,12 @@ package entities;
 
 import java.awt.Color; 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+
+import graphics.GraphicsHelp;
+import utilz.LoadSave;
 
 public abstract class Entity {
 
@@ -16,6 +20,9 @@ public abstract class Entity {
 	
 	protected BufferedImage[][] animations;
 	
+	protected Sword activeSword;
+	protected Shield activeShield;
+	
 	public Entity(float x, float y, int width, int height) {
 		this.x = x;
 		this.y = y;
@@ -23,6 +30,9 @@ public abstract class Entity {
 		this.height = height;
 		
 		//initHitbox();
+
+		this.activeSword = new Sword("c", LoadSave.SWORD_WOODEN_SWORD);
+		this.activeShield = new Shield("d", LoadSave.SHIELD_IRON_SHIELD);
 	}
 
 	// doesn't account for screen moving
@@ -50,6 +60,44 @@ public abstract class Entity {
 	
 	public BufferedImage[][] getAnimations() {
 		return animations;
+	}
+
+	public Sword getActiveSword() {
+		return activeSword;
+	}
+
+	public void setActiveSword(Sword activeSword) {
+		this.activeSword = activeSword;
+	}
+	
+	public void loadNormalCharacterAnimations(String bodyFileName, String hairFileName, String swordFileName, String shieldFileName) {
+		BufferedImage body = LoadSave.GetResource(bodyFileName);
+		BufferedImage hair = LoadSave.GetResource(hairFileName);
+		BufferedImage sword = LoadSave.GetResource(swordFileName);
+		BufferedImage shield = LoadSave.GetResource(shieldFileName);
+		
+		animations = new BufferedImage[8][8];
+		
+		for(int j = 0; j < animations.length; j++)
+			for(int i = 0; i < animations[j].length; i++) {
+				
+	            BufferedImage combinedImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+	            Graphics2D g2d = combinedImage.createGraphics();
+
+	            g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+
+	            g2d.dispose();
+
+	            animations[j][i] = combinedImage;
+				
+				if(j == 4 || j == 5)
+					animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
+			}
+		
+		
 	}
 	
 }

@@ -8,9 +8,9 @@ public class Constants {
 		
 		// battle type
 		public static final int ONE_VS_ONE = 0;
-		public static final int ONE_VS_TWO = 0;
-		public static final int TWO_VS_ONE = 0;
-		public static final int TWO_VS_TWO = 0;
+		public static final int ONE_VS_TWO = 1;
+		public static final int TWO_VS_ONE = 2;
+		public static final int TWO_VS_TWO = 3;
 		
 		// stats
 		public static final int HEALTH = 0;
@@ -55,6 +55,16 @@ public class Constants {
 			public static final int B_WIDTH = (int) (B_WIDTH_DEFAULT * Game.SCALE * B_SCALE);
 			public static final int B_HEIGHT = (int) (B_HEIGHT_DEFAULT * Game.SCALE * B_SCALE);
 		}
+		
+		public static class TargetButton{
+			public static final int X_OFFSET = 100;
+			public static final int Y_OFFSET = 85;
+			public static final int B_WIDTH_DEFAULT = 70;//95;
+			public static final int B_HEIGHT_DEFAULT = 90;//135;
+			public static final int B_SCALE = 1;
+			public static final int B_WIDTH = (int) (B_WIDTH_DEFAULT * Game.SCALE * B_SCALE);
+			public static final int B_HEIGHT = (int) (B_HEIGHT_DEFAULT * Game.SCALE * B_SCALE);
+		}
 	}
 	
 	public static class Directions{
@@ -86,6 +96,7 @@ public class Constants {
 		public static final int WALKING_AWAY = 3;	
 		public static final int BATTLE_IDLE = 4;
 		public static final int ATTACK = 5;
+		public static final int RUNNING = 6;
 		
 		public static final int SWING = 20;
 		public static final int JAB = 21;
@@ -128,6 +139,11 @@ public class Constants {
 				return new int[][] {
 					{0,1,2,0,1,2},
 					{ATK_1_FRAME_TIMES[0], ATK_1_FRAME_TIMES[1], ATK_1_FRAME_TIMES[2], ATK_1_FRAME_TIMES[0], ATK_1_FRAME_TIMES[1], ATK_1_FRAME_TIMES[2]}
+				};
+			case RUNNING:
+				return new int[][] {
+					{0,1,6,3,4,7},
+					{DEFAULT_MOVEMENT_TIME, DEFAULT_MOVEMENT_TIME, DEFAULT_MOVEMENT_TIME, DEFAULT_MOVEMENT_TIME, DEFAULT_MOVEMENT_TIME, DEFAULT_MOVEMENT_TIME}
 				};
 			case IDLE:
 				return new int[][] {

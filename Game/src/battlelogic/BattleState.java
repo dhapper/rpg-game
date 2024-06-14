@@ -10,19 +10,23 @@ public class BattleState {
 	
 	private int[] stats;
 	private String currMove = "NONE";
-	private int moveTarget;
+	private int moveTarget = -1;
 	private double currSpeed;
 	private int currDamage;
 	
+	private boolean alive;
 	
 	// animation variables
 	private boolean animating;
 	private int position; 
-	private int playerX;
+	private float playerX, playerY;
+	private float initialHeight;
 	
 	public BattleState(Entity entity) {
 		this.entity = entity;
 		this.stats = entity.getStats();
+		
+		this.alive = true;
 		
 		//System.out.println(stats[HEALTH]);
 		//System.out.println(stats[STRENGTH]);
@@ -91,12 +95,36 @@ public class BattleState {
 		this.position = position;
 	}
 
-	public int getPlayerX() {
+	public float getPlayerX() {
 		return playerX;
 	}
 
-	public void setPlayerX(int playerX) {
+	public void setPlayerX(float playerX) {
 		this.playerX = playerX;
+	}
+	
+	public float getPlayerY() {
+		return playerY;
+	}
+
+	public void setPlayerY(float playerY) {
+		this.playerY = playerY;
+	}
+
+	public float getInitialHeight() {
+		return initialHeight;
+	}
+
+	public void setInitialHeight(float initialHeight) {
+		this.initialHeight = initialHeight;
+	}
+
+	public boolean isAlive() {
+		return alive;
+	}
+
+	public void setAlive(boolean alive) {
+		this.alive = alive;
 	}
 	
 }

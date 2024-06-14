@@ -15,37 +15,26 @@ import java.util.Comparator;
 
 public class BattleManager implements Runnable {
 
-    //private Player player;
+	private Battle battle;
     private Entity[] players;
     private ArrayList<BattleState> battleStates;
     private ArrayList<BattleState> turnOrderedBattleStates;
-
-    private volatile boolean battleOver = false;
-    
     private DamageCalculation damageCalc;
     private int battleType;
-    private Battle battle;
     
+    private volatile boolean battleOver = false;
     
     public BattleManager(Battle battle, Entity[] players, int battleType) {
     	this.battle = battle;
     	this.players = players;
     	this.battleType = battleType;
     	
-    	
     	this.battleStates = new ArrayList<BattleState>();
-    	
-    	
     	initBattleStates();
-    	battleStates.get(PLAYER).setPosition(LEFT_MAIN);
-    	battleStates.get(NPC_1).setPosition(RIGHT_MAIN);
-    	battleStates.get(PLAYER).setPlayerX(300);
-    	battleStates.get(NPC_1).setPlayerX(Game.GAME_WIDTH - 300 - 300);
     	
+    	new InitBattleVars(this).initPlayerPos(battleType);
         this.damageCalc = new DamageCalculation(this);
         
-        
-        // Start the battle loop in a separate thread
         new Thread(this).start();
     }
 
@@ -58,73 +47,56 @@ public class BattleManager implements Runnable {
     	
         while (!battleOver) {
 
-            if (!battleStates.get(0).getCurrMove().equals("NONE")) {
-                
-            	System.out.println("1");
+            if (!battleStates.get(PLAYER).getCurrMove().equals("NONE") && battleStates.get(PLAYER).getMoveTarget() != -1) {
             	
-                //choose NPC moves
+            	
+                // choose NPC moves - randomized for now
                 for(BattleState bs : battleStates)
                 	if(!bs.equals(battleStates.get(PLAYER)))
-                		damageCalc.randomMove(bs);
+                		if(bs.isAlive())
+                			damageCalc.randomMove(bs);
                 
-                System.out.println("2");
                 
-                // calc speeds and order turns
+                // calculate speeds and order turns
                 new SpeedCalculation(this, battleStates).calcSpeed();;
                 turnOrderedBattleStates = getSortedBattleStatesBySpeed();
                 
-                //choose target - in damage for now
-                //battleStates.get(PLAYER_1).setMoveTarget(PLAYER_2);
+                // choose target - in damage for now
                 
-                System.out.println("3");
                 
-                ArrayList<String> turnMoves =  new ArrayList<String>();
-                for(BattleState bs : battleStates) {
-                	turnMoves.add(bs.getCurrMove());
-                }
-                battle.setTurnMoves(turnMoves);
+                for(BattleState bs : turnOrderedBattleStates)
+		            if(!bs.getEntity().equals(battleStates.get(PLAYER).getEntity()))
+		            	if(bs.isAlive())
+		            		damageCalc.setTarget(bs);
                 
-                System.out.println("4");
-                
-	            // turn one damage
+                // do attacks
                 for(BattleState bs : turnOrderedBattleStates) {
-                	battle.manageAnimations(bs);
-                	bs.setAnimating(true);
-                	damageCalc.damage(bs);
+                	if(bs.isAlive()) {
+                		battle.manageAnimations(bs);
+                    	bs.setAnimating(true);
+                    	damageCalc.damage(bs);	
                 	
-                	while(bs.isAnimating()) {
-                		try {
-							Thread.sleep(250);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+	                	while(bs.isAnimating()) {
+	                		try {
+								Thread.sleep(250);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+	                	}
+	                	
+	                	for(BattleState bs2 : battleStates)
+                			if(bs2.isAlive()) {
+                				checkIfDead(bs2);
+                				checkBattleOver();
+                			}
                 	}
                 }
-	                	
-                
-                System.out.println("5");
-                // death check
-	        	// break
-	    			
-	    		// status effect
-	    			
-	    		// death check
-	    		// break
+	             
                 
                 
-                // log
-                for(BattleState bs : turnOrderedBattleStates) {
-                	System.out.println(bs.getEntity().getName()+"'s turn");
-                	System.out.println("Speed: "+bs.getCurrSpeed());
-                	System.out.println("Move: "+bs.getCurrMove());
-                	System.out.println("Damage: "+bs.getCurrDamage());
-                	System.out.println("Target: "+battleStates.get(bs.getMoveTarget()).getEntity().getName());
-
-                	System.out.println();
-                }
                 
                 battleStates.get(PLAYER).setCurrMove("NONE");
-                battleStates.get(NPC_1).setCurrMove("NONE");
+                battleStates.get(PLAYER).setMoveTarget(-1);
             }
         }
             
@@ -133,14 +105,41 @@ public class BattleManager implements Runnable {
     }
 
  
+    private void checkIfDead(BattleState bs) {
+    	if(bs.getStats()[HEALTH] <= 0) {
+    		System.out.println(bs.getEntity().getName()+" fainted");
+    		bs.setAlive(false);
+    	}
+    }
+    
 
     private void checkBattleOver() {
     	
-        //if (playerHealth <= 0 || enemyHealth <= 0) {
-            battleOver = true;
-            System.out.println("Battle Over!");
+        if(!battleStates.get(PLAYER).isAlive()) {
             GameState.state = GameState.OVERWORLD;
-        //}
+            return;
+        }
+        
+        switch(battleType) {
+        case ONE_VS_ONE:
+        	if(!battleStates.get(NPC_1).isAlive())
+        		GameState.state = GameState.OVERWORLD;
+        	break;
+        case TWO_VS_ONE:
+        	if(!battleStates.get(NPC_2).isAlive())
+        		GameState.state = GameState.OVERWORLD;
+        	break;
+        case ONE_VS_TWO:
+        	if(!battleStates.get(NPC_1).isAlive())
+        		if(!battleStates.get(NPC_2).isAlive())
+        			GameState.state = GameState.OVERWORLD;
+        	break;
+        case TWO_VS_TWO:
+        	if(!battleStates.get(NPC_2).isAlive())
+        		if(!battleStates.get(NPC_3).isAlive())
+        			GameState.state = GameState.OVERWORLD;
+        	break;
+        }
     }
     
     

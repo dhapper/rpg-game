@@ -17,8 +17,7 @@ public class Move {
     private int statusInflictionRate;
     private boolean throwWeapon;
     private int animationID;
-    
-    private String target = "ENEMY";
+    private String defaultTarget;
 
     public Move(String name) {
         this.name = name;
@@ -45,6 +44,7 @@ public class Move {
                     statusInflictionRate = Integer.parseInt(moveData[8]);
                     throwWeapon = Boolean.parseBoolean(moveData[9]);
                     animationID = Integer.parseInt(moveData[10]) + 20;
+                    defaultTarget = moveData[11];
                     break; // Stop searching once the move is found
                 }
             }
@@ -141,13 +141,14 @@ public class Move {
 		this.animationID = animationID;
 	}
 
-	public String getTarget() {
-		return target;
+	public String getDefaultTarget() {
+		return defaultTarget;
 	}
 
-	public void setTarget(String target) {
-		this.target = target;
+	public void setDefaultTarget(String defaultTarget) {
+		this.defaultTarget = defaultTarget;
 	}
+
 
 	
     

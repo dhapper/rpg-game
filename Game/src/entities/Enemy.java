@@ -21,17 +21,20 @@ public class Enemy extends NPC{
 	}
 	
 	private void loadAnimations() {
-		BufferedImage img = LoadSave.GetResource(LoadSave.SKINTONE_1);
 		
-		animations = new BufferedImage[8][8];
-		for(int j = 0; j < animations.length; j++)
-			for(int i = 0; i < animations[j].length; i++) {
-				animations[j][i] = img.getSubimage(i * 64, j * 64, 64, 64);
-				
-				//keeping player animations consistently facing right
-				if(j == 4 || j == 5)
-					animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
-			}
+		loadNormalCharacterAnimations(LoadSave.SKINTONE_1, LoadSave.HAIR_BOY_0, activeSword.getFileName(), activeShield.getFileName());
+		
+//		BufferedImage img = LoadSave.GetResource(LoadSave.SKINTONE_1);
+//		
+//		animations = new BufferedImage[8][8];
+//		for(int j = 0; j < animations.length; j++)
+//			for(int i = 0; i < animations[j].length; i++) {
+//				animations[j][i] = img.getSubimage(i * 64, j * 64, 64, 64);
+//				
+//				//keeping player animations consistently facing right
+//				if(j == 4 || j == 5)
+//					animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
+//			}
 	}
 	
 	public BufferedImage returnImg() {

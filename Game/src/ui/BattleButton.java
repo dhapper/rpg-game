@@ -36,7 +36,7 @@ public class BattleButton extends Button {
 		imgs[0] = new BufferedImage(B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = imgs[0].createGraphics();
         g2d.setFont(new Font("ARIEL", Font.BOLD, 14));
-        g2d.setColor(new Color(200, 0, 0));
+        g2d.setColor(new Color(100, 100, 200));
         g2d.fillRect(0, 0, defaultWidth - 1, defaultHeight - 1);
         GraphicsHelp.borderedText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, Color.WHITE, 1, g2d);
         g2d.drawRect(0, 0, defaultWidth - 1, defaultHeight - 1);
@@ -45,7 +45,7 @@ public class BattleButton extends Button {
         imgs[1] = new BufferedImage(B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT, BufferedImage.TYPE_INT_ARGB);
         g2d = imgs[1].createGraphics();
         g2d.setFont(new Font("ARIEL", Font.BOLD, 14));
-        g2d.setColor(new Color(200, 100, 100));
+        g2d.setColor(new Color(120, 120, 220));
         g2d.fillRect(0, 0, defaultWidth - 1, defaultHeight - 1);
         GraphicsHelp.borderedText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, Color.WHITE, 1, g2d);
         g2d.drawRect(0, 0, defaultWidth - 1, defaultHeight - 1);
@@ -54,7 +54,7 @@ public class BattleButton extends Button {
         imgs[2] = new BufferedImage(B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT, BufferedImage.TYPE_INT_ARGB);
         g2d = imgs[2].createGraphics();
         g2d.setFont(new Font("ARIEL", Font.BOLD, 14));
-        g2d.setColor(new Color(100, 0, 0));
+        g2d.setColor(new Color(80, 80, 160));
         g2d.fillRect(0, 0, defaultWidth - 1, defaultHeight - 1);
         GraphicsHelp.borderedText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, Color.WHITE, 1, g2d);
         g2d.drawRect(0, 0, defaultWidth - 1, defaultHeight - 1);

@@ -1,9 +1,10 @@
 package gamestates;
 
 import static utilz.Constants.BattleConstants.*;
+
 import static utilz.Constants.PlayerConstants.GetAnimationData;
 import static utilz.Constants.PlayerConstants.*;
-import static utilz.Constants.UI.BattleButton.*;
+import static utilz.Constants.UI.*;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -21,113 +22,147 @@ import entities.Entity;
 import graphics.GraphicsHelp;
 import main.Game;
 import ui.BattleButton;
+import ui.Button;
 import ui.MenuButton;
+import ui.TargetButton;
 import utilz.Constants;
 
 public class Battle extends State implements Statemethods{
 
-	
-	Enemy test;
-	int i;
-	
-	int enemyX = game.GAME_WIDTH - 300 - 300;
-	boolean animating;
-	
-	boolean updatingButtons = true;
+	Enemy test, test2, test3;
 	
 	BattleManager battleManager;
+	private ArrayList<BattleButton> battleButtons;
+	private ArrayList<TargetButton> targetButtons;
+	private ArrayList<Button> buttons;
+	ArrayList<int[]> aniVars = new ArrayList<int[]>();
+	boolean animating;
+	boolean updatingBattleButtons = true;
+	boolean updatingTargetButtons = false;
+	Move[] moves;
 	
-	public ArrayList<String> turnMoves;
-
-	private ArrayList<BattleButton> buttons;
+	int prevAni = -1;
+	int aniLength = -1;
 	
-	public Battle(Game game, int i) {
+	int aniTick = 0;
+	int aniIndex = 0;
+	
+	int idleAniTick = 0;
+	int idleAniIndex = 0;
+	
+	int tickCount = 0;
+	int currFrame;
+	
+	int playerAction = BATTLE_IDLE;
+	int animationArrayIndex = playerAction;
+	
+	float xSpeed, ySpeed;
+	int imageMode;
+	
+	boolean walkingBack = false;
+	
+	public Battle(Game game) {
 		super(game);
-		this.i = i;
-		
-		this.turnMoves = new ArrayList<String>();
-		this.turnMoves.add("NONE");
-		this.turnMoves.add("NONE");
 		
 		
 		this.test = new Enemy(300, 300, 100, 100);
+		this.test2 = new Enemy(300, 300, 100, 100);
+		this.test3 = new Enemy(300, 300, 100, 100);
 		
-		this.buttons = new ArrayList<BattleButton>();
+		Entity players[] = {game.getOverworld().getPlayer(), test, test2};
+		this.battleManager = new BattleManager(this, players, ONE_VS_TWO);
+		
+		moves = battleManager.getBattleStates().get(0).getEntity().getActiveSword().getActiveMoves();
+		
+		this.battleButtons = new ArrayList<BattleButton>();
+		this.targetButtons = new ArrayList<TargetButton>();
+		this.buttons = new ArrayList<Button>();
 		loadButtons();
-		
-		Entity players[] = {game.getOverworld().getPlayer(), test};
-		this.battleManager = new BattleManager(this, players, ONE_VS_ONE);
 	}
 
 	@Override
 	public void update() {
 		updateAniTick();
 		
-		for (BattleButton bb : buttons)
-			bb.update();
+		for (Button b : buttons)
+			b.update();
 	}
 	
-	
-	int buttonW = 120;
-	int buttonH = 40;
 	
 	@Override
 	public void draw(Graphics g) {
 		
 		for(BattleState bs : battleManager.getBattleStates()) {
-			
-			BufferedImage[][] playerAnimations = bs.getEntity().getAnimations();
-			if(bs.isAnimating()) {
-				
-				//System.out.println(bs.getEntity().getName()+": "+bs.isAnimating());
-				
-				if(bs.getPosition() == LEFT_MAIN) {
-					if(imageMode == DEFAULT_IMAGE) {
-						g.drawImage(playerAnimations[playerAction][currFrame], bs.getPlayerX(), 300, 300, 300, null);	
-					}else if(imageMode == MIRROR_IMAGE){
-						g.drawImage(GraphicsHelp.MirrorImage(playerAnimations[playerAction][currFrame]), bs.getPlayerX(), 300, 300, 300, null);
-					}
-				}else if(bs.getPosition() == RIGHT_MAIN) {
-					if(imageMode == DEFAULT_IMAGE) {
-						g.drawImage(GraphicsHelp.MirrorImage(playerAnimations[playerAction][currFrame]),  bs.getPlayerX(), 300, 300, 300, null);	
-					}else if(imageMode == MIRROR_IMAGE){
-						g.drawImage(playerAnimations[playerAction][currFrame], bs.getPlayerX(), 300, 300, 300, null);
-					}
-				}
-				
-			}else {
-				if(bs.getPosition() == LEFT_MAIN) {
-					g.drawImage(playerAnimations[4][idleAniIndex], bs.getPlayerX(), 300, 300, 300, null);
-				}else if(bs.getPosition() == RIGHT_MAIN) {
-					g.drawImage(GraphicsHelp.MirrorImage(playerAnimations[4][idleAniIndex]), bs.getPlayerX(), 300, 300, 300, null);
-				}
+			switch(bs.getPosition()) {
+			case LEFT_MAIN:
+			case LEFT_1:
+				g.drawString("Health: "+bs.getStats()[HEALTH], 100, 100);
+				break;
+			case LEFT_2:
+				g.drawString("Health: "+bs.getStats()[HEALTH], 100, 150);
+				break;
+			case RIGHT_MAIN:
+			case RIGHT_1:
+				g.drawString("Health: "+bs.getStats()[HEALTH], 500, 100);
+				break;
+			case RIGHT_2:
+				g.drawString("Health: "+bs.getStats()[HEALTH], 500, 150);
+				break;
 			}
 		}
 		
-		if(imageMode == DEFAULT_IMAGE) {
-			
-		}else if(imageMode == MIRROR_IMAGE){
-			
+		for(BattleState bs : battleManager.getBattleStates()) {
+			BufferedImage[][] playerAnimations = bs.getEntity().getAnimations();
+			if(bs.isAlive()) {
+				if(bs.isAnimating()) {
+					if(bs.getPosition() == LEFT_MAIN || bs.getPosition() == LEFT_1 || bs.getPosition() == LEFT_2) {
+						if(imageMode == DEFAULT_IMAGE) {
+							g.drawImage(playerAnimations[playerAction][currFrame], (int) bs.getPlayerX(), (int) bs.getPlayerY(), 300, 300, null);	
+						}else if(imageMode == MIRROR_IMAGE){
+							g.drawImage(GraphicsHelp.MirrorImage(playerAnimations[playerAction][currFrame]), (int) bs.getPlayerX(), (int) bs.getPlayerY(), 300, 300, null);
+						}
+					}else if(bs.getPosition() == RIGHT_MAIN || bs.getPosition() == RIGHT_1 || bs.getPosition() == RIGHT_2) {
+						if(imageMode == DEFAULT_IMAGE) {
+							g.drawImage(GraphicsHelp.MirrorImage(playerAnimations[playerAction][currFrame]),  (int) bs.getPlayerX(), (int) bs.getPlayerY(), 300, 300, null);	
+						}else if(imageMode == MIRROR_IMAGE){
+							g.drawImage(playerAnimations[playerAction][currFrame], (int) bs.getPlayerX(), (int) bs.getPlayerY(), 300, 300, null);
+						}
+					}
+				}else {
+					if(bs.getPosition() == LEFT_MAIN || bs.getPosition() == LEFT_1 || bs.getPosition() == LEFT_2) {
+						g.drawImage(playerAnimations[4][idleAniIndex], (int) bs.getPlayerX(), (int) bs.getPlayerY(), 300, 300, null);
+					}else if(bs.getPosition() == RIGHT_MAIN || bs.getPosition() == RIGHT_1 || bs.getPosition() == RIGHT_2) {
+						g.drawImage(GraphicsHelp.MirrorImage(playerAnimations[4][idleAniIndex]), (int) bs.getPlayerX(), (int)bs.getPlayerY(), 300, 300, null);
+					}
+				}
+			}
 		}
+			
+
+		if(updatingTargetButtons) 
+			for (TargetButton tb : targetButtons) {
+				//if(tb.getBattleState() != null)
+					if(tb.getBattleState().isAlive())
+						tb.draw(g);}
 		
-		
-		g.drawString("BATTLE " + i, 100, 100);
-		g.drawString("HEALTH: "+battleManager.getBattleStates().get(0).getStats()[HEALTH], 100, 150);
-		g.drawString("HEALTH: "+battleManager.getBattleStates().get(1).getStats()[HEALTH], 500, 150);
-		
-		for (BattleButton bb : buttons)
+		for (BattleButton bb : battleButtons)
 			bb.draw(g);
-		
-		
 	}
 	
 	
 	private void loadButtons() {
+		battleButtons.add(new BattleButton(moves[0].getName(), Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4, 0));
+		battleButtons.add(new BattleButton(moves[1].getName(), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4, 0));
+		battleButtons.add(new BattleButton(moves[2].getName(), Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4 + Constants.UI.BattleButton.B_HEIGHT, 0));
+		battleButtons.add(new BattleButton(moves[3].getName(), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4 + Constants.UI.BattleButton.B_HEIGHT, 0));
 		
-		buttons.add(new BattleButton("SWING", Game.GAME_WIDTH / 2, 120, 0));
-		buttons.add(new BattleButton("JAB", Game.GAME_WIDTH / 2 + B_WIDTH, 120, 0));
-		buttons.add(new BattleButton("DOUBLE HIT", Game.GAME_WIDTH / 2, 120 + B_HEIGHT, 0));
-		buttons.add(new BattleButton("NULL", Game.GAME_WIDTH / 2 + B_WIDTH, 120 + B_HEIGHT, 0));
+		for(BattleState bs : battleManager.getBattleStates()) {
+			if(!bs.equals(battleManager.getBattleStates().get(PLAYER)))
+				targetButtons.add(new TargetButton((int)bs.getPlayerX() + Constants.UI.TargetButton.X_OFFSET, (int)bs.getPlayerY() + Constants.UI.TargetButton.Y_OFFSET, 0, bs));
+		}
+		
+		buttons.addAll(battleButtons);
+		buttons.addAll(targetButtons);
 	}
 	
 
@@ -149,15 +184,11 @@ public class Battle extends State implements Statemethods{
 	    int[] idleFrames = idleAniData[0];
 	    int[] idleDurations = idleAniData[1];
 	    
-	    
-	    
 	    if(idleAniTick >= idleDurations[idleAniIndex]) {
-	    	
 	    	idleAniTick = 0;
 	    	idleAniIndex++;
 	    	if(idleAniIndex >= idleFrames.length)
 	    		idleAniIndex = 0;
-	    		
 	    }
 	    
 	    
@@ -171,71 +202,48 @@ public class Battle extends State implements Statemethods{
 		currFrame = frames[aniIndex];
 		
 		for(BattleState bs : battleManager.getBattleStates()) {
-			if(bs.isAnimating())
+			if(bs.isAnimating()) {
 				bs.setPlayerX(bs.getPlayerX()+xSpeed);
+				bs.setPlayerY(bs.getPlayerY()+ySpeed);
+			}
 		}
 		
 		if(tickCount == aniLength) {
 			aniVars.remove(0);
 			if(aniVars.isEmpty()) {
-				updatingButtons = true;
+				updatingBattleButtons = true;
 				animating = false;
 				xSpeed = 0;
 				playerAction = BATTLE_IDLE;
 				animationArrayIndex = playerAction;
-				for(BattleState bs : battleManager.getBattleStates()) {
+				for(BattleState bs : battleManager.getBattleStates())
 					bs.setAnimating(false);
-				}
 			}else {
-				setAniVars(aniVars.get(0), battleManager.getBattleStates().get(PLAYER));
+				for(BattleState bs : battleManager.getBattleStates())
+					if(bs.isAnimating())
+						setAniVars(aniVars.get(0), bs);
 			}
 		}
 	}
 	
-	int prevAni = -1;
-	
-	int aniTick = 0;
-	int aniIndex = 0;
-	
-	int idleAniTick = 0;
-	int idleAniIndex = 0;
-	
-	
-	int playerAction = BATTLE_IDLE;
-	int currFrame;
-	
-	int tickCount = 0;
-	int aniLength = -1;
-	
-	int xSpeed;
-	int imageMode;
-	
-	int animationArrayIndex = playerAction;
-
-	
-	ArrayList<int[]> aniVars = new ArrayList<int[]>();
+	public void manageAnimations(BattleState bs) {
+		initAni(bs);
+	}
 	
 	public void initAni(BattleState bs) {
-		
-		updatingButtons = false;
-		
-		int speed = 3;
-		
+		updatingTargetButtons = false;
+		updatingBattleButtons = false;
+		int speedX = 3;
 		if(bs.getPosition() == RIGHT_MAIN || bs.getPosition() == RIGHT_1 || bs.getPosition() == RIGHT_2)
-			speed *= -1;
-		
+			speedX *= -1;
 		animating = true;
-		aniVars.add(new int[] {WALKING_SIDEWAYS, 170, speed, DEFAULT_IMAGE});	// use vars
+		aniVars.add(new int[] {WALKING_SIDEWAYS, 170, speedX, DEFAULT_IMAGE});	// use vars
 		aniVars.add(new int[] {ATTACK, 0, 0, DEFAULT_IMAGE});
-		aniVars.add(new int[] {WALKING_SIDEWAYS, 170, -speed, MIRROR_IMAGE});
-		
+		aniVars.add(new int[] {WALKING_SIDEWAYS, 170, -speedX, MIRROR_IMAGE});
 		setAniVars(aniVars.get(0), bs);
 	}
 	
-	boolean reverseSpeed = false;
-	
 	public void setAniVars(int aniVars[], BattleState bs) {
-		
 		prevAni = -1;
 		aniTick = 0;
 		aniIndex = 0;
@@ -245,30 +253,42 @@ public class Battle extends State implements Statemethods{
 		aniLength = aniVars[1];
 		xSpeed = aniVars[2];
 		imageMode = aniVars[3];
+		ySpeed = 0;
 		
-		animationArrayIndex = playerAction;
+		animationArrayIndex = WALKING_SIDEWAYS;
 		
-		//if(xSpeed > 0)
-			//if(bs.getPosition() == RIGHT_MAIN || bs.getPosition() == RIGHT_1 || bs.getPosition() == RIGHT_2)
-				//xSpeed *= -1;
+		if(playerAction == WALKING_SIDEWAYS) {
+			ySpeed = checkHeights(bs);
+			
+			if(walkingBack) {
+				ySpeed = -checkHeights(bs);
+			}
+			walkingBack = !walkingBack;
+		}
+		
 		
 		if(playerAction != WALKING_SIDEWAYS) {
 			Move move = new Move(bs.getCurrMove());
-			animationArrayIndex = new Move(turnMoves.get(0)).getAnimationID();
+			animationArrayIndex = move.getAnimationID();
 			aniLength = 0;
 			for(int time : GetAnimationData(animationArrayIndex)[1]){
 				aniLength += time;
 			}
 		}
-		
-		//System.out.println(turnMoves.get(0));
-		//System.out.println(turnMoves.get(1));
-		
 	}
 	
-	public void manageAnimations(BattleState bs) {
-		
-		initAni(bs);
+	public float checkHeights(BattleState attacker) {
+		BattleState target = battleManager.getBattleStates().get(attacker.getMoveTarget());
+		if(attacker.getInitialHeight() == target.getInitialHeight() - 75)
+			return 0.45f;
+		else if(attacker.getInitialHeight() == target.getInitialHeight() - 150)
+			return 0.9f;
+		else if(attacker.getInitialHeight() == target.getInitialHeight() + 75)
+			return -0.45f;
+		else if(attacker.getInitialHeight() == target.getInitialHeight() + 150)
+			return -0.9f;
+		else
+			return 0;
 	}
 	
 	@Override
@@ -278,8 +298,8 @@ public class Battle extends State implements Statemethods{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if(updatingButtons) {
-			for (BattleButton bb : buttons) {
+		if(updatingBattleButtons) {
+			for (BattleButton bb : battleButtons) {
 				if(isIn(e, bb)) {	
 					bb.setMousePressed(true);
 					break;
@@ -287,59 +307,96 @@ public class Battle extends State implements Statemethods{
 			}	
 		}
 		
+		if(updatingTargetButtons) {
+			for (TargetButton tb : targetButtons) {
+				if(tb.getBattleState().isAlive())
+					if(isIn(e, tb)) {
+						tb.setMousePressed(true);
+						break;
+					}
+			}
+		}
+		
 	}
-	
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if(updatingButtons) {
-			for (BattleButton bb : buttons) {
+		if(updatingBattleButtons) {
+			for (BattleButton bb : battleButtons) {
 				if(isIn(e, bb)) {
 					if(bb.isMousePressed()) {
-						if(bb.equals(buttons.get(0))) {
-							battleManager.getBattleStates().get(0).setCurrMove("SWING");
-						}else if(bb.equals(buttons.get(1))) {
-							battleManager.getBattleStates().get(0).setCurrMove("JAB");
-						}else if(bb.equals(buttons.get(2))) {
-							battleManager.getBattleStates().get(0).setCurrMove("DOUBLE HIT");
+						if(bb.equals(battleButtons.get(0))) {
+							battleManager.getBattleStates().get(0).setCurrMove(moves[0].getName());
+							updatingTargetButtons = true;
+						}else if(bb.equals(battleButtons.get(1))) {
+							battleManager.getBattleStates().get(0).setCurrMove(moves[1].getName());
+							updatingTargetButtons = true;
+						}else if(bb.equals(battleButtons.get(2))) {
+							battleManager.getBattleStates().get(0).setCurrMove(moves[2].getName());
+							updatingTargetButtons = true;
+						}else if(bb.equals(battleButtons.get(3))) {
+							battleManager.getBattleStates().get(0).setCurrMove(moves[3].getName());
+							updatingTargetButtons = true;
 						}
-					
-						
 						break;
 					}
 						
 				}
 			}
-			resetButtons();
+			resetBattleButtons();
 		}
 		
+		if(updatingTargetButtons) {
+			for (TargetButton tb : targetButtons) {
+				if(isIn(e, tb)) {
+					if(tb.isMousePressed()) { 
+						
+						if(tb.equals(targetButtons.get(0))) {
+							battleManager.getBattleStates().get(PLAYER).setMoveTarget(NPC_1);
+						
+						}else if(targetButtons.size() > 1) {
+							if(tb.equals(targetButtons.get(1)))
+								battleManager.getBattleStates().get(PLAYER).setMoveTarget(NPC_2);
+						}else if(targetButtons.size() > 2) {
+							if(tb.equals(targetButtons.get(2)))
+								battleManager.getBattleStates().get(PLAYER).setMoveTarget(NPC_3);
+						}
+						
+						break;
+					}	
+				}
+			}
+			resetTargetButtons();
+		}
 	}
 
-	private void resetButtons() {
-		for(BattleButton mb : buttons)
-			mb.resetBools();
+	private void resetBattleButtons() {
+		for(BattleButton bb : battleButtons)
+			bb.resetBools();
+	}
+	
+	private void resetTargetButtons() {
+		for(TargetButton tb : targetButtons)
+			tb.resetBools();
 		
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		for(BattleButton bb : buttons)
-			bb.setMouseOver(false);
+		for(Button b : buttons)
+			b.setMouseOver(false);
 		
-		for(BattleButton bb : buttons)
-			if(isIn(e, bb)) {
-				bb.setMouseOver(true);
-			break;
+		for(Button b : buttons)
+			if(isIn(e, b)) {
+				b.setMouseOver(true);
+				break;
 			}
-		
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		
 		if(e.getKeyCode() == KeyEvent.VK_B)
 			GameState.state = GameState.OVERWORLD;
-		
 	}
 
 	@Override
@@ -347,14 +404,4 @@ public class Battle extends State implements Statemethods{
 		// TODO Auto-generated method stub
 		
 	}
-
-	public ArrayList<String> getTurnMoves() {
-		return turnMoves;
-	}
-
-	public void setTurnMoves(ArrayList<String> turnMoves) {
-		this.turnMoves = turnMoves;
-	}
-
-	
 }

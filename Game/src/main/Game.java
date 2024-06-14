@@ -45,7 +45,7 @@ public class Game implements Runnable{
 	int i = 0;
 	public void createBattle() {
 		i++;
-		battle = new Battle(this, i);
+		battle = new Battle(this);
 	}
 
 	private void startGameLoop() {

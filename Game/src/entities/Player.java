@@ -5,6 +5,7 @@ import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.CanMoveHere;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -23,19 +24,26 @@ public class Player extends Entity {
 	private int prevAni = -1;
 	private boolean facingRight = true, facingLeft = false, facingForward = false, facingBackward = false;
 	
+	//private ArrayList<>
+	
 	//private int health = 50;
 	//private int strength = 10;
 	//private int speed = 10;
 	
 	public Player(float x, float y, int width, int height) {
 		super(x, y, width, height);
-		loadAnimations();
 		initHitbox(x, y, HITBOX_WIDTH, HITBOX_HEIGHT);
 		
 		this.name = "dhaarsh";
 		this.health = 50;
-		this.strength = 20;
-		this.speed = 10;
+		this.strength = 45;
+		this.speed = 20;
+		
+		this.activeSword = new Sword("a", LoadSave.SWORD_IRON_SWORD);
+		this.activeShield = new Shield("b", LoadSave.SHIELD_IRON_SHIELD);
+		
+		
+		loadAnimations();
 	}
 
 	public void update() {
@@ -157,12 +165,37 @@ public class Player extends Entity {
 	}
 	
 	private void loadAnimations() {
-		BufferedImage img = LoadSave.GetResource(LoadSave.SKINTONE_0);
+		
+		
+		loadNormalCharacterAnimations(LoadSave.SKINTONE_0, LoadSave.HAIR_BOY_0, activeSword.getFileName(), activeShield.getFileName());
+		
+		BufferedImage body = LoadSave.GetResource(LoadSave.SKINTONE_0);
+		BufferedImage hair = LoadSave.GetResource(LoadSave.HAIR_BOY_0);
+		BufferedImage sword = LoadSave.GetResource(activeSword.getFileName());
+		BufferedImage shield = LoadSave.GetResource(activeShield.getFileName());
 		
 		animations = new BufferedImage[8][8];
+		
 		for(int j = 0; j < animations.length; j++)
 			for(int i = 0; i < animations[j].length; i++) {
-				animations[j][i] = img.getSubimage(i * 64, j * 64, 64, 64);
+				
+				// Create a new BufferedImage for the combined image
+	            BufferedImage combinedImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+	            Graphics2D g2d = combinedImage.createGraphics();
+
+	            g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            
+	            g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+
+	            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            
+	            g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+
+	            // Dispose of the graphics context to free resources
+	            g2d.dispose();
+
+	            // Assign the combined image to the animations array
+	            animations[j][i] = combinedImage;
 				
 				//keeping player animations consistently facing right
 				if(j == 4 || j == 5)
