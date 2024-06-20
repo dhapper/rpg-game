@@ -2,20 +2,17 @@ package entities;
 
 import java.util.ArrayList;
 
-import battlelogic.Move;
+import battle.Move;
 
-public class Sword {
+public class Sword extends Item{
 
-	private String name;
 	private int damage;
 	private int speed;
-	
-	private String fileName;
 	
 	private Move[] activeMoves;
 	private ArrayList<Move> moveset;
 	
-	public Sword(String name, String fileName) {
+	public Sword(String name, String fileName, int damage, int speed) {
 		this.name = name;
 		this.damage = 10;
 		this.speed = 10;
@@ -27,14 +24,6 @@ public class Sword {
 		activeMoves[1] = new Move("JAB");
 		activeMoves[2] = new Move("DOUBLE HIT");
 		activeMoves[3] = new Move("SWING");
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public int getDamage() {
@@ -68,14 +57,7 @@ public class Sword {
 	public void setMoveset(ArrayList<Move> moveset) {
 		this.moveset = moveset;
 	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+	
 	
 	
 }

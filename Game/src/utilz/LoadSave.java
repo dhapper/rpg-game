@@ -11,19 +11,29 @@ import javax.imageio.ImageIO;
 
 public class LoadSave {
 
-	public static final String PLAYER_ATLAS = "player.png";
-	public static final String MENU_BUTTONS = "menu buttons.png";
+	public static final String bg = "bg.png";
+	
+	public static final String MENU_BUTTONS = "MENU_BUTTONS.png";
+	public static final String ALT_BATTLE_BUTTONS = "BATTLE_BUTTONS_ALT.png";
+	public static final String INVENTORY_ICONS = "INVENTORY_ICONS.png";
+	public static final String BACK_BUTTON = "BACK_BUTTON.png";
+	
+	public static final String SHADOW = "SHADOW.png";
 	
 	public static final String SKINTONE_0 = "SKINTONE_0.png";
 	public static final String SKINTONE_1 = "SKINTONE_1.png";
 	
 	public static final String HAIR_BOY_0 = "HAIR_BOY_0.png";
 	
+	public static final String SWORD_BRONZE_SWORD = "SWORD_BRONZE_SWORD.png";
 	public static final String SWORD_IRON_SWORD = "SWORD_IRON_SWORD.png";
 	public static final String SWORD_WOODEN_SWORD = "SWORD_WOODEN_SWORD.png";
 	
 	public static final String SHIELD_IRON_SHIELD = "SHIELD_IRON_SHIELD.png";
+	public static final String SHIELD_STEEL_SHIELD = "SHIELD_STEEL_SHIELD.png";
 	public static final String SHIELD_WOODEN_SHIELD = "SHIELD_WOODEN_SHIELD.png";
+	
+	public static final String ARMOUR_M_BASIC = "ARMOUR_M_BASIC.png";
 	
 	public static final String LAYER_MAP_Lo0_W_S_La1 = "LAYER_MAP_Lo0_W_S_La1.png";
 	public static final String LAYER_MAP_Lo0_W_S_La2 = "LAYER_MAP_Lo0_W_S_La2.png";

@@ -1,5 +1,9 @@
 package ui;
 
+import static utilz.Constants.UI.BattleButton.B_HEIGHT;
+import static utilz.Constants.UI.BattleButton.B_WIDTH;
+
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -7,7 +11,7 @@ import utilz.LoadSave;
 
 public abstract class Button {
 
-	protected int xPos, yPos, rowIndex, index;
+	protected int xPos, yPos, rowIndex, index, width, height;
 	
 	BufferedImage[] imgs;
 	protected boolean mouseOver, mousePressed;
@@ -20,15 +24,6 @@ public abstract class Button {
 	protected void initBounds(int width, int height) {
 		bounds = new Rectangle(xPos, yPos, width, height);
 	}
-
-	
-//	protected void loadImgs(String fileName, int defaultWidth, int defaultHeight) {
-//		imgs = new BufferedImage[3];
-//		BufferedImage temp = LoadSave.GetResource(fileName);
-//		
-//		for(int i = 0; i < imgs.length; i++)
-//			imgs[i] = temp.getSubimage(i * defaultWidth, rowIndex * defaultHeight, defaultWidth, defaultHeight);
-//	}
 	
 	public void update() {
 		index = 0;
@@ -36,6 +31,11 @@ public abstract class Button {
 			index = 1;
 		if(mousePressed)
 			index = 2;
+	}
+	
+	public void draw(Graphics g) {
+		g.drawImage(imgs[index], xPos, yPos, width, height, null);
+		
 	}
 	
 	public void resetBools() {
@@ -62,4 +62,14 @@ public abstract class Button {
 	public Rectangle getBounds() {
 		return bounds;
 	}
+
+	public int getxPos() {
+		return xPos;
+	}
+
+	public int getyPos() {
+		return yPos;
+	}
+	
+	
 }

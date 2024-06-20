@@ -1,17 +1,18 @@
-package battlelogic;
+package battle;
 
 import static utilz.Constants.BattleConstants.*;
 
 import main.Game;
+import utilz.Constants.BattleConstants.Graphics.Players;
 
 public class InitBattleVars {
 
-	private int scale = 300;
-	private int xOffsetLeft = 300;
-	private int xOffsetRight = Game.GAME_WIDTH - xOffsetLeft - scale;
-	private int yOffsetMain = 250;
-	private int yOffset1 = 175;
-	private int yOffset2 = 325;
+//	private int scale = 300;
+//	private int xOffsetLeft = 300;
+//	private int xOffsetRight = Game.GAME_WIDTH - xOffsetLeft - scale;
+//	private int yOffsetMain = 250;
+//	private int yOffset1 = 175;
+//	private int yOffset2 = 325;
 	
 	private BattleManager battleManager;
 	
@@ -53,31 +54,38 @@ public class InitBattleVars {
 		
 		switch(positionNum) {
 		case LEFT_MAIN:
-			xOffset = xOffsetLeft;
-			yOffset = yOffsetMain;
+			xOffset = Players.X_OFFSET_LEFT;
+			yOffset = Players.Y_OFFSET_MAIN;
 			break;
 		case RIGHT_MAIN:
-			xOffset = xOffsetRight;
-			yOffset = yOffsetMain;
+			xOffset = Players.X_OFFSET_RIGHT;
+			yOffset = Players.Y_OFFSET_MAIN;
 			break;
 		case LEFT_1:
-			xOffset = xOffsetLeft;
-			yOffset = yOffset1;
+			xOffset = Players.X_OFFSET_LEFT;
+			yOffset = Players.Y_OFFSET_HIGHER;
 			break;
 		case LEFT_2:
-			xOffset = xOffsetLeft;
-			yOffset = yOffset2;
+			xOffset = Players.X_OFFSET_LEFT;
+			yOffset = Players.Y_OFFSET_LOWER;
 			break;
 		case RIGHT_1:
-			xOffset = xOffsetRight;
-			yOffset = yOffset1;
+			xOffset = Players.X_OFFSET_RIGHT;
+			yOffset = Players.Y_OFFSET_HIGHER;
 			break;
 		case RIGHT_2:
-			xOffset = xOffsetRight;
-			yOffset = yOffset2;
+			xOffset = Players.X_OFFSET_RIGHT;
+			yOffset = Players.Y_OFFSET_LOWER;
 			break;
 		}
 		
+		if(positionNum == LEFT_MAIN || positionNum == LEFT_1 || positionNum == LEFT_2) {
+			battleManager.getBattleStates().get(playerNum).setEnemyTeam(false);
+		} else {
+			battleManager.getBattleStates().get(playerNum).setEnemyTeam(true);
+		}
+		
+		battleManager.getBattleStates().get(playerNum).setPlayerID(playerNum);
 		battleManager.getBattleStates().get(playerNum).setPosition(positionNum);
 		battleManager.getBattleStates().get(playerNum).setPlayerX(xOffset);
 		battleManager.getBattleStates().get(playerNum).setPlayerY(yOffset);

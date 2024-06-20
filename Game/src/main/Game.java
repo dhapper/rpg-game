@@ -2,8 +2,10 @@ package main;
 
 import java.awt.Graphics;
 
+import entities.Player;
 import gamestates.Battle;
 import gamestates.GameState;
+import gamestates.Inventory;
 import gamestates.Menu;
 import gamestates.Overworld;
 
@@ -18,6 +20,7 @@ public class Game implements Runnable{
 	private Overworld overworld;
 	private Menu menu;
 	private Battle battle;
+	private Inventory inventory;
 	
 	public final static int TILES_DEFAULT_SIZE = 32;
 	public final static float SCALE = 1.5f;
@@ -39,6 +42,7 @@ public class Game implements Runnable{
 	private void initClasses() {
 		menu = new Menu(this);
 		overworld = new Overworld(this);
+		inventory = new Inventory(this);
 		//battle = new Battle(this);
 	}
 	
@@ -65,6 +69,9 @@ public class Game implements Runnable{
 		case BATTLE:
 			battle.update();
 			break;
+		case INVENTORY:
+			inventory.update();
+			break;
 		default:
 			break;
 		
@@ -80,8 +87,11 @@ public class Game implements Runnable{
 		case OVERWORLD:
 			overworld.draw(g);
 			break;
-		case BATTLE:
+		case BATTLE:	
 			battle.draw(g);
+			break;
+		case INVENTORY:
+			inventory.draw(g);
 			break;
 		default:
 			break;
@@ -149,4 +159,10 @@ public class Game implements Runnable{
 	public Battle getBattle() {
 		return battle;
 	}
+
+	public Inventory getInventory() {
+		return inventory;
+	}
+
+	
 }

@@ -23,25 +23,49 @@ public class Player extends Entity {
 
 	private int prevAni = -1;
 	private boolean facingRight = true, facingLeft = false, facingForward = false, facingBackward = false;
-	
-	//private ArrayList<>
-	
-	//private int health = 50;
-	//private int strength = 10;
-	//private int speed = 10;
+
+	protected ArrayList<Sword> swords;
+	protected ArrayList<Shield> shields;
+	protected ArrayList<Armour> armoury;
 	
 	public Player(float x, float y, int width, int height) {
 		super(x, y, width, height);
 		initHitbox(x, y, HITBOX_WIDTH, HITBOX_HEIGHT);
 		
 		this.name = "dhaarsh";
+		
 		this.health = 50;
 		this.strength = 45;
 		this.speed = 20;
+		this.stamina = 50;
+		this.evasiveness = 5;
+		this.attackMultiplier = 0;
+		this.defenseMultiplier = 0;
+		this.speedMultiplier = 0;
+		this.evasivenessMultiplier = 0;
 		
-		this.activeSword = new Sword("a", LoadSave.SWORD_IRON_SWORD);
-		this.activeShield = new Shield("b", LoadSave.SHIELD_IRON_SHIELD);
+		this.activeSword = new Sword("iron", LoadSave.SWORD_IRON_SWORD, 10, 10);
+		this.inactiveSword = new Sword("wooden", LoadSave.SWORD_WOODEN_SWORD, 10, 10);
+		this.activeShield = new Shield("iron sh", LoadSave.SHIELD_IRON_SHIELD);
+		this.activeArmour = new Armour("bb", LoadSave.ARMOUR_M_BASIC);
+	
+		swords = new ArrayList<Sword>();
+		shields = new ArrayList<Shield>();
+		armoury = new ArrayList<Armour>();
 		
+		this.swords.add(activeSword);
+		this.swords.add(inactiveSword);
+		this.swords.add(new Sword("bronze", LoadSave.SWORD_BRONZE_SWORD, 0, 0));
+		
+		this.shields.add(activeShield);
+		this.shields.add(new Shield("wooden", LoadSave.SHIELD_WOODEN_SHIELD));
+		this.shields.add(new Shield("steel", LoadSave.SHIELD_STEEL_SHIELD));
+		
+		this.armoury.add(activeArmour);
+		
+		
+		this.bodyFileName = LoadSave.SKINTONE_0;
+		this.hairFileName = LoadSave.HAIR_BOY_0;
 		
 		loadAnimations();
 	}
@@ -164,48 +188,12 @@ public class Player extends Entity {
 		facingBackward = false;
 	}
 	
-	private void loadAnimations() {
+	public void loadAnimations() {
 		
-		
-		loadNormalCharacterAnimations(LoadSave.SKINTONE_0, LoadSave.HAIR_BOY_0, activeSword.getFileName(), activeShield.getFileName());
-		
-		BufferedImage body = LoadSave.GetResource(LoadSave.SKINTONE_0);
-		BufferedImage hair = LoadSave.GetResource(LoadSave.HAIR_BOY_0);
-		BufferedImage sword = LoadSave.GetResource(activeSword.getFileName());
-		BufferedImage shield = LoadSave.GetResource(activeShield.getFileName());
-		
-		animations = new BufferedImage[8][8];
-		
-		for(int j = 0; j < animations.length; j++)
-			for(int i = 0; i < animations[j].length; i++) {
-				
-				// Create a new BufferedImage for the combined image
-	            BufferedImage combinedImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
-	            Graphics2D g2d = combinedImage.createGraphics();
+		loadNormalCharacterAnimations(bodyFileName, hairFileName, activeSword.getFileName(), activeShield.getFileName(), activeArmour.getFileName());
 
-	            g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-	            
-	            g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-
-	            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-	            
-	            g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-
-	            // Dispose of the graphics context to free resources
-	            g2d.dispose();
-
-	            // Assign the combined image to the animations array
-	            animations[j][i] = combinedImage;
-				
-				//keeping player animations consistently facing right
-				if(j == 4 || j == 5)
-					animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
-			}
 	}
 	
-//	public BufferedImage[][] getAnimations() {
-//		return animations;
-//	}
 	
 	
 	public void addLocationData(String fileName) {
@@ -255,9 +243,21 @@ public class Player extends Entity {
 	public void setDown(boolean down) {
 		this.down = down;
 	}
+
+	public ArrayList<Sword> getSwords() {
+		return swords;
+	}
+
+	public ArrayList<Shield> getShields() {
+		return shields;
+	}
+
+	public ArrayList<Armour> getArmoury() {
+		return armoury;
+	}
+
 	
-//	public int[] getStats() {
-//		return new int[] {health, strength, speed};
-//	}
+	
+	
 	
 }

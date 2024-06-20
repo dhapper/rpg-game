@@ -237,19 +237,18 @@ public class Overworld extends State implements Statemethods{
 			rightPressed = false;
 			keyOrder.remove(Character.valueOf('D'));
 			break;
-	}
+		}
 		
 	}
 	
 	public void windowFocusLost() {
 		player.resetDirBooleans();
-		
 	}
 	
 	public Player getPlayer() {
 		return player;
 	}
-	
+
 	public LocationManager getLocationManager() {
 		return locationManager;
 	}

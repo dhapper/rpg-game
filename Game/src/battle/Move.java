@@ -1,4 +1,4 @@
-package battlelogic;
+package battle;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -6,22 +6,27 @@ import java.io.IOException;
 
 public class Move {
 
-    private String name;
-    private int damage;
-    private int speedModifier;
-    private int numOfHits;
-    private int critMultiplier;
-    private int accuracy;
-    private boolean spread;
-    private String statusInfliction;
-    private int statusInflictionRate;
-    private boolean throwWeapon;
-    private int animationID;
-    private String defaultTarget;
-
+    private String name ="a";
+    private int damage = 1;
+    private int speedModifier = 1;
+    private int numOfHits =1 ;
+    private int critMultiplier = 1;
+    private int accuracy = 1;
+    private boolean spread = false;;
+    private String statusInfliction = "Asd";
+    private int statusInflictionRate = 1;
+    private boolean throwWeapon = false;
+    private int animationID = 0;;
+    private String defaultTarget = "ENEMY";
+    
+    String animationType;
+    int staminaDelta;
+    int nullify;
+    String target;
+    
     public Move(String name) {
         this.name = name;
-        readMoveDataFromCSV();
+        //readMoveDataFromCSV();
     }
 
     private void readMoveDataFromCSV() {
@@ -45,6 +50,11 @@ public class Move {
                     throwWeapon = Boolean.parseBoolean(moveData[9]);
                     animationID = Integer.parseInt(moveData[10]) + 20;
                     defaultTarget = moveData[11];
+                    
+                    animationType = moveData[12];
+                    staminaDelta = Integer.parseInt(moveData[15]);
+                    nullify = Integer.parseInt(moveData[18]);
+                    target = moveData[10];
                     break; // Stop searching once the move is found
                 }
             }
@@ -147,6 +157,38 @@ public class Move {
 
 	public void setDefaultTarget(String defaultTarget) {
 		this.defaultTarget = defaultTarget;
+	}
+
+	public String getAnimationType() {
+		return animationType;
+	}
+
+	public void setAnimationType(String animationType) {
+		this.animationType = animationType;
+	}
+
+	public int getStaminaDelta() {
+		return staminaDelta;
+	}
+
+	public void setStaminaDelta(int staminaDelta) {
+		this.staminaDelta = staminaDelta;
+	}
+
+	public int getNullify() {
+		return nullify;
+	}
+
+	public void setNullify(int nullify) {
+		this.nullify = nullify;
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
 

@@ -1,4 +1,4 @@
-package battlelogic;
+package battle;
 
 import entities.Entity;
 import entities.NPC;
@@ -47,15 +47,28 @@ public class BattleManager implements Runnable {
     	
         while (!battleOver) {
 
-            if (!battleStates.get(PLAYER).getCurrMove().equals("NONE") && battleStates.get(PLAYER).getMoveTarget() != -1) {
+            if ((!battleStates.get(PLAYER).getCurrMove().equals(Moves.NONE) && battleStates.get(PLAYER).getMoveTarget() != -1)
+            		|| battleStates.get(PLAYER).getCurrMove().equals(Moves.SWAP)) {
             	
+            	// setting target as player if target value is invalid
+            	if(battleStates.get(PLAYER).getMoveTarget() == -1) {
+            		battleStates.get(PLAYER).setMoveTarget(PLAYER);
+            	}
             	
                 // choose NPC moves - randomized for now
-                for(BattleState bs : battleStates)
+            	// swap logic
+                for(BattleState bs : battleStates) {
                 	if(!bs.equals(battleStates.get(PLAYER)))
                 		if(bs.isAlive())
                 			damageCalc.randomMove(bs);
                 
+//                	if(bs.getCurrMove().equals(Moves.SWAP)) {
+//                		bs.getEntity().swapActiveSword();
+//                		bs.getEntity().loadNormalCharacterAnimations(bs.getEntity().getBodyFileName(), bs.getEntity().getHairFileName(),
+//                				bs.getEntity().getActiveSword().getFileName(), bs.getEntity().getActiveShield().getFileName());
+//                	}
+                		
+                }
                 
                 // calculate speeds and order turns
                 new SpeedCalculation(this, battleStates).calcSpeed();;
@@ -84,26 +97,46 @@ public class BattleManager implements Runnable {
 							}
 	                	}
 	                	
-	                	for(BattleState bs2 : battleStates)
+	                	for(BattleState bs2 : battleStates) {
                 			if(bs2.isAlive()) {
                 				checkIfDead(bs2);
                 				checkBattleOver();
                 			}
+                			
+	                	}
                 	}
                 }
 	             
                 
+                // reset vars
+                for(BattleState bs : turnOrderedBattleStates) {
+                	//.battleLog(bs);
+                	bs.setBlockingStance(false);
+                	bs.setDefensiveMoveQuantity(0);
+                }
                 
-                
-                battleStates.get(PLAYER).setCurrMove("NONE");
+                battleStates.get(PLAYER).setCurrMove(Moves.NONE);
                 battleStates.get(PLAYER).setMoveTarget(-1);
             }
         }
-            
-           // checkBattleOver();
         
     }
 
+    public void battleLog(BattleState bs) {
+    	System.out.println(bs.getEntity().getName());
+    	System.out.println("speed: "+bs.getCurrSpeed());
+    	System.out.println("move: "+bs.getCurrMove().getName());
+    	if(bs.getCurrMove().getAnimationType().equals("ATTACK")) {
+    		System.out.println("target: "+battleStates.get(bs.getMoveTarget()).getEntity().getName());
+    		System.out.println("hits: "+bs.getCurrMove().getNumOfHits());
+    		System.out.println("damage: "+bs.getCurrDamage());
+    		
+    	}else if(bs.getCurrMove().getAnimationType().equals("BLOCKING")) {
+    		System.out.println("defense counter: "+bs.getDefensiveMoveQuantity());
+    	}
+    	
+    	System.out.println();
+    }
  
     private void checkIfDead(BattleState bs) {
     	if(bs.getStats()[HEALTH] <= 0) {
@@ -160,6 +193,18 @@ public class BattleManager implements Runnable {
     
     public void setBattleType(int battleType) {
 		this.battleType = battleType;
+	}
+
+	public DamageCalculation getDamageCalc() {
+		return damageCalc;
+	}
+
+	public void setDamageCalc(DamageCalculation damageCalc) {
+		this.damageCalc = damageCalc;
+	}
+
+	public Battle getBattle() {
+		return battle;
 	}
 
 	// Method to get sorted BattleState list by currSpeed in descending order

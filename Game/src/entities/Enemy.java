@@ -12,29 +12,26 @@ public class Enemy extends NPC{
 		super(x, y, width, height);
 		
 		this.name = "test bot";
+		
 		this.health = 40;
 		this.strength = 10;
 		this.speed = 9;
+		this.stamina = 50;
+		this.evasiveness = 5;
+		this.attackMultiplier = 0;
+		this.defenseMultiplier = 0;
+		this.speedMultiplier = 0;
+		this.evasivenessMultiplier = 0;
+		
+		this.bodyFileName = LoadSave.SKINTONE_1;
+		this.hairFileName = LoadSave.HAIR_BOY_0;
 		
 		sprites = new ArrayList<BufferedImage>();
 		loadAnimations();
 	}
 	
 	private void loadAnimations() {
-		
-		loadNormalCharacterAnimations(LoadSave.SKINTONE_1, LoadSave.HAIR_BOY_0, activeSword.getFileName(), activeShield.getFileName());
-		
-//		BufferedImage img = LoadSave.GetResource(LoadSave.SKINTONE_1);
-//		
-//		animations = new BufferedImage[8][8];
-//		for(int j = 0; j < animations.length; j++)
-//			for(int i = 0; i < animations[j].length; i++) {
-//				animations[j][i] = img.getSubimage(i * 64, j * 64, 64, 64);
-//				
-//				//keeping player animations consistently facing right
-//				if(j == 4 || j == 5)
-//					animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
-//			}
+		loadNormalCharacterAnimations(bodyFileName, hairFileName, activeSword.getFileName(), activeShield.getFileName(), activeArmour.getFileName());
 	}
 	
 	public BufferedImage returnImg() {

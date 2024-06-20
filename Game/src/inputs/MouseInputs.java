@@ -33,6 +33,9 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 		case BATTLE:
 			gamePanel.getGame().getBattle().mouseMoved(e);
 			break;
+		case INVENTORY:
+			gamePanel.getGame().getInventory().mouseMoved(e);
+			break;
 		default:
 			break;
 		
@@ -53,6 +56,9 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 		case BATTLE:
 			gamePanel.getGame().getBattle().mouseClicked(e);
 			break;
+		case INVENTORY:
+			gamePanel.getGame().getInventory().mouseClicked(e);
+			break;
 		default:
 			break;
 		
@@ -72,6 +78,9 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 		case BATTLE:
 			gamePanel.getGame().getBattle().mousePressed(e);
 			break;
+		case INVENTORY:
+			gamePanel.getGame().getInventory().mousePressed(e);
+			break;
 		default:
 			break;
 		
@@ -90,6 +99,9 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 			break;
 		case BATTLE:
 			gamePanel.getGame().getBattle().mouseReleased(e);
+			break;
+		case INVENTORY:
+			gamePanel.getGame().getInventory().mouseReleased(e);
 			break;
 		default:
 			break;

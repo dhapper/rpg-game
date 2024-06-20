@@ -1,4 +1,4 @@
-package battlelogic;
+package battle;
 
 import static utilz.Constants.BattleConstants.*;
 
@@ -18,11 +18,10 @@ public class SpeedCalculation {
 	
 	public void calcSpeed() {
 		Random random = new Random();
-		ArrayList<Integer> speeds = new ArrayList<Integer>();
 		
 		for(BattleState bs : battleStates) {
-			// if player dead, then skip
-			double speed = bs.getStats()[SPEED] * new Move(bs.getCurrMove()).getSpeedModifier() / 10;
+			
+			double speed = (bs.getStats()[SPEED] + bs.getEntity().getActiveSword().getSpeed()) * bs.getCurrMove().getSpeedModifier() / 10;
 			speed *=  0.8 + (1.2 - 0.8) * random.nextDouble();
 			bs.setCurrSpeed(speed);
 		}

@@ -7,18 +7,21 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import battlelogic.BattleState;
+import battle.BattleState;
 import utilz.LoadSave;
 
 public class TargetButton extends Button{
 	
-	BattleState battleState;
+	private BattleState battleState;
 	
 	public TargetButton(int xPos, int yPos, int rowIndex, BattleState battleState) {
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.rowIndex = rowIndex;
 		this.battleState = battleState;
+		
+		this.width = B_WIDTH;
+		this.height = B_HEIGHT;
 		
 		loadImgs(LoadSave.MENU_BUTTONS, B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT);
 		initBounds(B_WIDTH, B_HEIGHT);

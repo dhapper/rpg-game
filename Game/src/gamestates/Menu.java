@@ -1,5 +1,6 @@
 package gamestates;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import java.awt.event.KeyEvent;
@@ -12,7 +13,7 @@ import static utilz.Constants.UI.MenuButton.*;
 
 public class Menu extends State implements Statemethods{
 
-	private MenuButton[] buttons = new MenuButton[1];
+	private MenuButton[] buttons = new MenuButton[2];
 	
 	public Menu(Game game) {
 		super(game);
@@ -20,7 +21,12 @@ public class Menu extends State implements Statemethods{
 	}
 
 	private void loadButtons() {
-		buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - B_WIDTH / 2, (int) (100 * Game.SCALE), 0, GameState.OVERWORLD);
+		int gap = 25;
+		int yOffsetPlayButton = (int) (100 * Game.SCALE);
+		int yOffsetInventoryButton = yOffsetPlayButton + B_HEIGHT + gap; 
+		
+		buttons[0] = new MenuButton(Game.GAME_WIDTH / 2 - B_WIDTH / 2, yOffsetPlayButton, 0, GameState.OVERWORLD);
+		buttons[1] = new MenuButton(Game.GAME_WIDTH / 2 - B_WIDTH / 2, yOffsetInventoryButton, 1, GameState.INVENTORY);
 		
 	}
 
@@ -34,6 +40,10 @@ public class Menu extends State implements Statemethods{
 	@Override
 	public void draw(Graphics g) {
 		// TODO Auto-generated method stub
+		
+		g.setColor(Color.DARK_GRAY);
+		g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
+		
 		for (MenuButton mb : buttons)
 			mb.draw(g);
 		

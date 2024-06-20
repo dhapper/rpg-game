@@ -36,6 +36,9 @@ public class KeyboardInputs implements KeyListener{
 		case BATTLE:
 			gamePanel.getGame().getBattle().keyReleased(e);
 			break;
+		case INVENTORY:
+			gamePanel.getGame().getInventory().keyReleased(e);
+			break;
 		default:
 			break;
 		
@@ -55,6 +58,9 @@ public class KeyboardInputs implements KeyListener{
 			break;
 		case BATTLE:
 			gamePanel.getGame().getBattle().keyPressed(e);
+			break;
+		case INVENTORY:
+			gamePanel.getGame().getInventory().keyPressed(e);
 			break;
 		default:
 			break;
