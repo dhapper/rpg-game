@@ -118,20 +118,20 @@ public class DamageCalculation {
 		
 		if(move.getAnimationID() == Constants.PlayerConstants.BLOCKING) {
 			bs.setBlockingStance(true);
-			//bs.setDefensiveMoveQuantity(bs.getCurrMove().getNumOfHits());
+			bs.setDefensiveMoveQuantity(bs.getCurrMove().getNumOfHits());
 		}
 		
 		double damage = 0;
 		BattleState target = battleManager.getBattleStates().get(bs.getMoveTarget());
 		
-		for(int i = 0; i < 1;i++) {//move.getNumOfHits(); i++) {
+		for(int i = 0; i < move.getNumOfHits(); i++) {
 			
-			double hitDamage = 0;//(bs.getStats()[STRENGTH] + bs.getEntity().getActiveSword().getDamage()) * move.getDamage() / 100.0;
-			
-			if(bs.getCurrSpeed() < target.getCurrSpeed() && bs.getCurrMove().getAnimationType().equals("DAMAGING")) {
+			double hitDamage = bs.getStats()[STRENGTH] + bs.getEntity().getActiveSword().getDamage() * move.getDamage() / 100.0;
+			System.out.println(bs.getStats()[STRENGTH] + " | " + bs.getEntity().getActiveSword().getDamage() + " | " +move.getDamage());
+			if(bs.getCurrSpeed() < target.getCurrSpeed() && bs.getCurrMove().getAnimationType().equals("ATTACKING")) {
 				if(target.getDefensiveMoveQuantity() > 0) {
 					
-					//hitDamage -= hitDamage * target.getCurrMove().getBlockPercentage() / 100.0;
+					hitDamage -= hitDamage * target.getCurrMove().getNullify() / 100.0;
 					
 					target.setDefensiveMoveQuantity(battleManager.getBattleStates().get(bs.getMoveTarget()).getDefensiveMoveQuantity() - 1);
 					
@@ -142,8 +142,8 @@ public class DamageCalculation {
 			
 		}
 		
-		damage *= multiplier(bs.getStats()[ATTACK_MULTIPLIER]);
 		
+		damage *= multiplier(bs.getStats()[ATTACK_MULTIPLIER]);
 		
 		
 		target.setPrevHealth(battleManager.getBattleStates().get(bs.getMoveTarget()).getStats()[HEALTH]);

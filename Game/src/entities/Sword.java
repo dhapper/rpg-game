@@ -23,7 +23,7 @@ public class Sword extends Item{
 		activeMoves[0] = new Move("SWING");
 		activeMoves[1] = new Move("JAB");
 		activeMoves[2] = new Move("DOUBLE HIT");
-		activeMoves[3] = new Move("SWING");
+		activeMoves[3] = new Move("SINGLE BLOCK");
 	}
 
 	public int getDamage() {

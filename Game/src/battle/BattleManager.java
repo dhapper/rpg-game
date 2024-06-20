@@ -110,7 +110,7 @@ public class BattleManager implements Runnable {
                 
                 // reset vars
                 for(BattleState bs : turnOrderedBattleStates) {
-                	//.battleLog(bs);
+                	battleLog(bs);
                 	bs.setBlockingStance(false);
                 	bs.setDefensiveMoveQuantity(0);
                 }

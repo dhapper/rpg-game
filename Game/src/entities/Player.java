@@ -35,7 +35,7 @@ public class Player extends Entity {
 		this.name = "dhaarsh";
 		
 		this.health = 50;
-		this.strength = 45;
+		this.strength = 20;
 		this.speed = 20;
 		this.stamina = 50;
 		this.evasiveness = 5;
