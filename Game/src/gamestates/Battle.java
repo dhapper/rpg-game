@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import battle.BattleManager;
 import battle.BattleState;
 import battle.Move;
+import battle.MoveMethods;
 import entities.Enemy;
 import entities.Entity;
 import entities.Sword;
@@ -151,11 +152,11 @@ public class Battle extends State implements Statemethods{
 	
 	private void loadButtons() {
 		
-		battleButtons.add(new BattleButton(moves[0].getName(), Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4));
-		battleButtons.add(new BattleButton(moves[1].getName(), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4));
-		battleButtons.add(new BattleButton(moves[2].getName(),
+		battleButtons.add(new BattleButton(moves[0], Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4));
+		battleButtons.add(new BattleButton(moves[1], Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4));
+		battleButtons.add(new BattleButton(moves[2],
 				Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4 + Constants.UI.BattleButton.B_HEIGHT));
-		battleButtons.add(new BattleButton(moves[3].getName(), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4 + Constants.UI.BattleButton.B_HEIGHT));
+		battleButtons.add(new BattleButton(moves[3], Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4 + Constants.UI.BattleButton.B_HEIGHT));
 		
 		for(BattleState bs : battleManager.getBattleStates()) {
 			hoveringPlayerButtons.add(new HoveringRect((int)bs.getPlayerX() + Constants.UI.TargetButton.X_OFFSET,
@@ -189,6 +190,14 @@ public class Battle extends State implements Statemethods{
 		tickCount++;
 		aniTick++;
 		idleAniTick++;
+		
+//		for(BattleState bs : battleManager.getBattleStates()) {
+//			if(bs.isAnimatingDeath()) {
+//				System.out.println(bs.getPlayerID());
+//				//bs.getEntity().loadNormalCharacterAnimations();
+//				bs.getEntity().loadPlayerAlterAlpha(0.5f);
+//			}
+//		}
 		
 		int[][] aniData = GetAnimationData(animationArrayIndex);
 	    int[] frames = aniData[0];
@@ -233,46 +242,66 @@ public class Battle extends State implements Statemethods{
 					battleManager.getBattleStates().get(bs.getMoveTarget()).setPrevHealth(battleManager.getBattleStates().get(bs.getMoveTarget()).getStats()[HEALTH]);
 					bs.setPrevStamina(bs.getStats()[STAMINA]);
 					bs.setAnimating(false);
-					if(bs.getDefensiveMoveQuantity() == 0)
-						bs.setBlockingStance(false);
+					bs.setAnimatingDeath(false);
+					if(bs.getDefensiveMoveQuantity() == 0) {
+						// change visual after specific animation, animation changes after turn ends is in battleManager
+						bs.getEntity().loadNormalCharacterAnimations();
+						bs.getEntity().loadStatChangedAnimation(bs);
+	                	bs.setBlockingStance(false);
+					}
 				}
 			}else {
 				for(BattleState bs : battleManager.getBattleStates())
 					if(bs.isAnimating())
-						setAniVars(aniVars.get(0), bs);
+						setAniVars(aniVars.get(0), bs, false);
 			}
 		}
 	}
 	
-	public void manageAnimations(BattleState bs) {
-		initAni(bs);
+	public void manageAnimations(BattleState bs, boolean isDead) {
+		initAni(bs, isDead);
 	}
 	
-	public void initAni(BattleState bs) {
+	public void initAni(BattleState bs, boolean isDead) {
 		updatingTargetButtons = false;
 		updatingBattleButtons = false;
 		int speedX = 3;
+		
+		if(isDead) {
+			aniVars.add(new int[] {BATTLE_IDLE, 170, 0, DEFAULT_IMAGE});
+			setAniVars(aniVars.get(0), bs, isDead);
+			bs.getEntity().loadNormalCharacterAnimations();
+			bs.getEntity().loadPlayerAlterAlpha(0.5f);
+			return;
+		}
+		
 		if(bs.getPosition() == RIGHT_MAIN || bs.getPosition() == RIGHT_1 || bs.getPosition() == RIGHT_2)
 			speedX *= -1;
 		
-		if(bs.getCurrMove().getAnimationType() != null) {
-			if(bs.getCurrMove().getAnimationType().equals("ATTACK")) {
+		if(bs.getCurrMove().getMoveType() != null) {
+			if(bs.getCurrMove().getMoveType().equals("DAMAGING")) {
 			
 				aniVars.add(new int[] {WALKING_SIDEWAYS, 170, speedX, DEFAULT_IMAGE});	// use vars
 				aniVars.add(new int[] {ATTACK, 0, 0, DEFAULT_IMAGE});
 				aniVars.add(new int[] {WALKING_SIDEWAYS, 170, -speedX, MIRROR_IMAGE});
 			
-			}else if(bs.getCurrMove().getAnimationType().equals("SWAP")){
+			}else if(bs.getCurrMove().equals(Moves.SWAP)){
 				aniVars.add(new int[] {ATTACK, 0, 0, DEFAULT_IMAGE});
-			}else if(bs.getCurrMove().getAnimationType().equals("BLOCK")) {
+			}else if(bs.getCurrMove().getMoveType().equals("BLOCKING")) {
+				bs.getEntity().loadProtectionBubbleVisual();
 				aniVars.add(new int[] {BLOCK, 0, 0, DEFAULT_IMAGE});
+			}else if(bs.getCurrMove().getMoveType().equals("HEALING")) {
+				aniVars.add(new int[] {BLOCK, 0, 0, DEFAULT_IMAGE});
+			}else if(bs.getCurrMove().getMoveType().equals("STAT_CHANGE")) {
+				aniVars.add(new int[] {ATTACK, 0, 0, DEFAULT_IMAGE});
 			}
 		}
-		setAniVars(aniVars.get(0), bs);
+		setAniVars(aniVars.get(0), bs, isDead);
 
 	}
 	
-	public void setAniVars(int aniVars[], BattleState bs) {
+	public void setAniVars(int aniVars[], BattleState bs, boolean isDead) {
+		
 		prevAni = -1;
 		aniTick = 0;
 		aniIndex = 0;
@@ -285,6 +314,12 @@ public class Battle extends State implements Statemethods{
 		ySpeed = 0;
 		
 		animationArrayIndex = WALKING_SIDEWAYS;
+		
+		if(isDead) {
+			animationArrayIndex = BATTLE_IDLE;
+			//bs.getEntity().loadPlayerAlterAlpha(0.5f);
+			return;
+		}
 		
 		if(playerAction == WALKING_SIDEWAYS) {
 			ySpeed = checkHeights(bs);
@@ -366,13 +401,13 @@ public class Battle extends State implements Statemethods{
 				if(isIn(e, bb)) {
 					if(bb.isMousePressed()) {
 						if(bb.equals(battleButtons.get(MOVESLOT_1)))
-							battleManager.getDamageCalc().isMoveValid(player, moves[0]);
+							MoveMethods.isMoveValid(battleManager, player, moves[0]);
 						else if(bb.equals(battleButtons.get(MOVESLOT_2)))
-							battleManager.getDamageCalc().isMoveValid(player, moves[1]);
+							MoveMethods.isMoveValid(battleManager, player, moves[1]);
 						else if(bb.equals(battleButtons.get(MOVESLOT_3)))
-							battleManager.getDamageCalc().isMoveValid(player, moves[2]);
+							MoveMethods.isMoveValid(battleManager, player, moves[2]);
 						else if(bb.equals(battleButtons.get(MOVESLOT_4)))
-							battleManager.getDamageCalc().isMoveValid(player, moves[3]);
+							MoveMethods.isMoveValid(battleManager, player, moves[3]);
 						
 						if(player.getCurrMove().getTarget() != null) {
 							if(player.getCurrMove().getTarget().equals("ENEMY")) {
@@ -381,7 +416,6 @@ public class Battle extends State implements Statemethods{
 								player.setMoveTarget(PLAYER);;
 							}
 						}
-						
 						
 						break;
 					}
@@ -404,7 +438,6 @@ public class Battle extends State implements Statemethods{
 			resetAltBattleButtons();
 		}
 		
-		
 		if(updatingTargetButtons) {
 			for (TargetButton tb : targetButtons) {
 				if(isIn(e, tb)) {
@@ -414,6 +447,7 @@ public class Battle extends State implements Statemethods{
 						}else if(tb.equals(targetButtons.get(1))) {
 							player.setMoveTarget(NPC_2);
 						}else if(tb.equals(targetButtons.get(2))) {
+							System.out.println("asd");
 							player.setMoveTarget(NPC_3);
 						}
 						

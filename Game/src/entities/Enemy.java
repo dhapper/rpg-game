@@ -27,11 +27,12 @@ public class Enemy extends NPC{
 		this.hairFileName = LoadSave.HAIR_BOY_0;
 		
 		sprites = new ArrayList<BufferedImage>();
+		
 		loadAnimations();
 	}
 	
 	private void loadAnimations() {
-		loadNormalCharacterAnimations(bodyFileName, hairFileName, activeSword.getFileName(), activeShield.getFileName(), activeArmour.getFileName());
+		loadNormalCharacterAnimations();
 	}
 	
 	public BufferedImage returnImg() {

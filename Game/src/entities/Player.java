@@ -34,7 +34,7 @@ public class Player extends Entity {
 		
 		this.name = "dhaarsh";
 		
-		this.health = 50;
+		this.health = 500;
 		this.strength = 20;
 		this.speed = 20;
 		this.stamina = 50;
@@ -190,7 +190,7 @@ public class Player extends Entity {
 	
 	public void loadAnimations() {
 		
-		loadNormalCharacterAnimations(bodyFileName, hairFileName, activeSword.getFileName(), activeShield.getFileName(), activeArmour.getFileName());
+		loadNormalCharacterAnimations();//bodyFileName, hairFileName, activeSword.getFileName(), activeShield.getFileName(), activeArmour.getFileName());
 
 	}
 	

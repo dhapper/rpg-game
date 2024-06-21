@@ -1,14 +1,17 @@
 package entities;
 
-import java.awt.Color; 
+import java.awt.Color;  
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import battle.BattleState;
 import graphics.GraphicsHelp;
 import utilz.LoadSave;
+
+import static utilz.Constants.BattleConstants.*;
 
 public abstract class Entity {
 
@@ -28,6 +31,8 @@ public abstract class Entity {
 	
 	protected String bodyFileName;
 	protected String hairFileName;
+	
+	protected Color statColour;
 	
 	public Entity(float x, float y, int width, int height) {
 		this.x = x;
@@ -126,74 +131,120 @@ public abstract class Entity {
 		this.hairFileName = hairFileName;
 	}
 
-	public void loadNormalCharacterAnimations(String bodyFileName, String hairFileName, String swordFileName, String shieldFileName, String armourFileName) {
-		BufferedImage body = LoadSave.GetResource(bodyFileName);
-		BufferedImage hair = LoadSave.GetResource(hairFileName);
-		BufferedImage sword = LoadSave.GetResource(swordFileName);
-		BufferedImage shield = LoadSave.GetResource(shieldFileName);
-		BufferedImage armour = LoadSave.GetResource(armourFileName);
+	public Color getStatColour() {
+		return statColour;
+	}
+
+	public void setStatColour(Color statColour) {
+		this.statColour = statColour;
+	}
+
+	public void loadProtectionBubbleVisual() {
+		for(int j = 0; j < animations.length; j++)
+			for(int i = 0; i < animations[j].length; i++) {
+				BufferedImage combinedImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+	            Graphics2D g2d = combinedImage.createGraphics();
+    			g2d.drawImage(animations[j][i], 0, 0, 64, 64, null);
+    			g2d.drawImage(GraphicsHelp.decreaseAlpha(LoadSave.GetResource(LoadSave.PROTECTION_BUBBLE), 0.2f), 3, 10, 44, 44, null);
+    			g2d.dispose();
+    			animations[j][i] = combinedImage;
+			}
+	}
+	
+	public void loadStatChangedAnimation(BattleState bs) {
 		
-		BufferedImage shadow = LoadSave.GetResource(LoadSave.SHADOW);
+		int[] stat = {ATTACK_MULTIPLIER, DEFENSE_MULTIPLIER, SPEED_MULTIPLIER, EVASIVENESS_MULTIPLIER};
+		boolean displayVisual = false;
+		for(int statIndex : stat)
+			if(bs.getStats()[statIndex] != 0)
+				displayVisual = true;
 		
-		animations = new BufferedImage[8][8];
+		System.out.println(getName() + " " + displayVisual);
 		
 		for(int j = 0; j < animations.length; j++)
 			for(int i = 0; i < animations[j].length; i++) {
-				
-				
 				BufferedImage combinedImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
 	            Graphics2D g2d = combinedImage.createGraphics();
-				
-	            //g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-	            
-	            g2d.drawImage(shadow.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-	            
-				if(j == 2 && i != 3 && i != 4) {
-		            g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-				}else if(j == 3) {
-					
-		            g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-					if(i != 0 && i != 1) {
-						g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-						g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-			            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-			            g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-					}else {
-						g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-						g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-						g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-			            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-			            
-					}
-				}else if(j == 6) {
-		            g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-				}else {
-					g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
-		            g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+				if(displayVisual) {
+		            g2d.setColor(new Color(255, 255, 255, 25));
+	    			g2d.drawRect(17, 13, 30, 38);
+		            g2d.setColor(statColour);
+	    			g2d.fillRect(17 + 1, 13 + 1, 30 - 1, 38 - 1);
 				}
+    			g2d.drawImage(animations[j][i], 0, 0, 64, 64, null);
+    			g2d.dispose();
+    			animations[j][i] = combinedImage;
+			}
+	}
+	
+	public void loadPlayerAlterAlpha(float alpha) {
+		for (int j = 0; j < animations.length; j++) {
+	        for (int i = 0; i < animations[j].length; i++) {
+	            animations[j][i] = GraphicsHelp.decreaseAlpha(animations[j][i], alpha); // Use a reasonable factor to see the effect
+	        }
+	    }
+	}
+	
+	public void loadNormalCharacterAnimations() {
+	    BufferedImage body = LoadSave.GetResource(bodyFileName);
+	    BufferedImage hair = LoadSave.GetResource(hairFileName);
+	    BufferedImage sword = LoadSave.GetResource(activeSword.getFileName());
+	    BufferedImage shield = LoadSave.GetResource(activeShield.getFileName());
+	    BufferedImage armour = LoadSave.GetResource(activeArmour.getFileName());
+	    BufferedImage shadow = LoadSave.GetResource(LoadSave.SHADOW);
+
+	    animations = new BufferedImage[8][8];
+
+	    for (int j = 0; j < animations.length; j++) {
+	        for (int i = 0; i < animations[j].length; i++) {
+	            BufferedImage combinedImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+	            Graphics2D g2d = combinedImage.createGraphics();
+
+	            g2d.drawImage(shadow.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+
+	            if (j == 2 && i != 3 && i != 4) {
+	                g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            } else if (j == 3) {
+	                g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                if (i != 0 && i != 1) {
+	                    g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                    g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                    g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                    g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                } else {
+	                    g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                    g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                    g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                    g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                }
+	            } else if (j == 6) {
+	                g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            } else {
+	                g2d.drawImage(shield.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(body.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(armour.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(hair.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	                g2d.drawImage(sword.getSubimage(i * 64, j * 64, 64, 64), 0, 0, null);
+	            }
 
 	            g2d.dispose();
 
 	            animations[j][i] = combinedImage;
-				
-				if(j == 4 || j == 5 || j == 6) {
-					animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);	
-				}
-				
-			}
-		
-		
+
+	            if (j == 4 || j == 5 || j == 6) {
+	                animations[j][i] = GraphicsHelp.MirrorImage(animations[j][i]);
+	            }
+	        }
+	    }
 	}
+
 	
 }

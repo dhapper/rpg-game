@@ -104,7 +104,7 @@ public class Constants {
 		}
 		
 		public static class BattleButton{
-			public static final int B_WIDTH_DEFAULT = 160;
+			public static final int B_WIDTH_DEFAULT = 180;
 			public static final int B_HEIGHT_DEFAULT = 40;
 			public static final int B_SCALE = 1;
 			public static final int B_WIDTH = (int) (B_WIDTH_DEFAULT * Game.SCALE * B_SCALE);

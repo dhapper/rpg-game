@@ -6,33 +6,38 @@ import java.io.IOException;
 
 public class Move {
 
-    private String name;
-    private int damage;
-    private int speedModifier;
-    private int numOfHits;
-    private int critMultiplier;
-    private int accuracy;
-    private boolean spread;
-    private String statusInfliction;
-    private int statusInflictionRate;
-    private boolean throwWeapon;
-    private int animationID;
-    private String defaultTarget;
-    String animationType;
-    boolean neverMiss;
-    String weapon;
-    int staminaDelta;
-    String stat;
-    int rate;
-    int nullify;
-    String target;
-    
-    public Move(String name) {
-        this.name = name;
+	private String name;
+	private String weapon;
+	private String moveType;
+	private String target;
+	private int speed;
+	private int accuracy;
+	private int staminaDelta;
+	private int animationID;
+	
+	// damaging
+	private int damage;
+	private int numOfHits;
+	private int critMultiplier;
+	
+	// blocking
+	private int numOfBlocks;
+	private int nullify;
+	private int reflect;
+	
+	// healing
+	private int heal;
+	
+	// stat change
+	private String statName;
+	private int statDelta;
+	
+	public Move(String name) {
+		this.name = name;
         readMoveDataFromCSV();
-    }
-
-    private void readMoveDataFromCSV() {
+	}
+	
+	private void readMoveDataFromCSV() {
         String csvFile = "res/moves.csv";
         String line;
         String cvsSplitBy = ",";
@@ -42,25 +47,35 @@ public class Move {
                 String[] moveData = line.split(cvsSplitBy);
                 if (moveData[0].equalsIgnoreCase(name)) {
                     // Found the move, read its data
-                    damage = Integer.parseInt(moveData[1]);
-                    speedModifier = Integer.parseInt(moveData[2]);
-                    numOfHits = Integer.parseInt(moveData[3]);
-                    critMultiplier = Integer.parseInt(moveData[4]);
-                    accuracy = Integer.parseInt(moveData[5]);
-                    spread = Boolean.parseBoolean(moveData[6]);
-                    statusInfliction = moveData[7];
-                    statusInflictionRate = Integer.parseInt(moveData[8]);
-                    throwWeapon = Boolean.parseBoolean(moveData[9]);
-                    animationID = Integer.parseInt(moveData[10]) + 20;
-                    defaultTarget = moveData[11];
-                    animationType = moveData[12];
-                    neverMiss = Boolean.parseBoolean(moveData[13]);
-                    weapon = moveData[14];
-                    staminaDelta = Integer.parseInt(moveData[15]);
-                    stat = moveData[16];
-                    rate = Integer.parseInt(moveData[17]);
-                    nullify = Integer.parseInt(moveData[18]);
-                    target = moveData[19];
+                   
+                	this.moveType = moveData[1];
+                	this.weapon = moveData[2];
+                	this.speed = Integer.parseInt(moveData[3]);
+                	this.accuracy = Integer.parseInt(moveData[4]);
+                	this.target = moveData[5];
+                	this.staminaDelta = Integer.parseInt(moveData[6]);
+                	this.animationID = Integer.parseInt(moveData[7]);
+                    
+                	switch(moveType) {
+                	case "DAMAGING":
+                		this.damage = Integer.parseInt(moveData[8]);
+                		this.numOfHits = Integer.parseInt(moveData[9]);
+                		this.critMultiplier = Integer.parseInt(moveData[10]); 
+                		break;
+                	case "BLOCKING":
+                		this.numOfBlocks = Integer.parseInt(moveData[8]);
+                		this.nullify = Integer.parseInt(moveData[9]);
+                		this.reflect = Integer.parseInt(moveData[10]);
+                		break;
+                	case "HEALING":
+                		this.heal = Integer.parseInt(moveData[8]);
+                		break;
+                	case "STAT_CHANGE":
+                		this.statName = moveData[8];
+                		this.statDelta = Integer.parseInt(moveData[9]);
+                		break;
+                	}
+                	
                     break; // Stop searching once the move is found
                 }
             }
@@ -77,20 +92,68 @@ public class Move {
 		this.name = name;
 	}
 
+	public String getWeapon() {
+		return weapon;
+	}
+
+	public void setWeapon(String weapon) {
+		this.weapon = weapon;
+	}
+
+	public String getMoveType() {
+		return moveType;
+	}
+
+	public void setMoveType(String moveType) {
+		this.moveType = moveType;
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
+	public int getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+
+	public int getAccuracy() {
+		return accuracy;
+	}
+
+	public void setAccuracy(int accuracy) {
+		this.accuracy = accuracy;
+	}
+
+	public int getStaminaDelta() {
+		return staminaDelta;
+	}
+
+	public void setStaminaDelta(int staminaDelta) {
+		this.staminaDelta = staminaDelta;
+	}
+
+	public int getAnimationID() {
+		return animationID;
+	}
+
+	public void setAnimationID(int animationID) {
+		this.animationID = animationID;
+	}
+
 	public int getDamage() {
 		return damage;
 	}
 
 	public void setDamage(int damage) {
 		this.damage = damage;
-	}
-
-	public int getSpeedModifier() {
-		return speedModifier;
-	}
-
-	public void setSpeedModifier(int speedModifier) {
-		this.speedModifier = speedModifier;
 	}
 
 	public int getNumOfHits() {
@@ -109,76 +172,12 @@ public class Move {
 		this.critMultiplier = critMultiplier;
 	}
 
-	public int getAccuracy() {
-		return accuracy;
+	public int getNumOfBlocks() {
+		return numOfBlocks;
 	}
 
-	public void setAccuracy(int accuracy) {
-		this.accuracy = accuracy;
-	}
-
-	public boolean isSpread() {
-		return spread;
-	}
-
-	public void setSpread(boolean spread) {
-		this.spread = spread;
-	}
-
-	public String getStatusInfliction() {
-		return statusInfliction;
-	}
-
-	public void setStatusInfliction(String statusInfliction) {
-		this.statusInfliction = statusInfliction;
-	}
-
-	public int getStatusInflictionRate() {
-		return statusInflictionRate;
-	}
-
-	public void setStatusInflictionRate(int statusInflictionRate) {
-		this.statusInflictionRate = statusInflictionRate;
-	}
-
-	public boolean isThrowWeapon() {
-		return throwWeapon;
-	}
-
-	public void setThrowWeapon(boolean throwWeapon) {
-		this.throwWeapon = throwWeapon;
-	}
-
-	public int getAnimationID() {
-		return animationID;
-	}
-
-	public void setAnimationID(int animationID) {
-		this.animationID = animationID;
-	}
-
-	public String getDefaultTarget() {
-		return defaultTarget;
-	}
-
-	public void setDefaultTarget(String defaultTarget) {
-		this.defaultTarget = defaultTarget;
-	}
-
-	public String getAnimationType() {
-		return animationType;
-	}
-
-	public void setAnimationType(String animationType) {
-		this.animationType = animationType;
-	}
-
-	public int getStaminaDelta() {
-		return staminaDelta;
-	}
-
-	public void setStaminaDelta(int staminaDelta) {
-		this.staminaDelta = staminaDelta;
+	public void setNumOfBlocks(int numOfBlocks) {
+		this.numOfBlocks = numOfBlocks;
 	}
 
 	public int getNullify() {
@@ -189,15 +188,38 @@ public class Move {
 		this.nullify = nullify;
 	}
 
-	public String getTarget() {
-		return target;
+	public int getReflect() {
+		return reflect;
 	}
 
-	public void setTarget(String target) {
-		this.target = target;
+	public void setReflect(int reflect) {
+		this.reflect = reflect;
 	}
 
+	public int getHeal() {
+		return heal;
+	}
+
+	public void setHeal(int heal) {
+		this.heal = heal;
+	}
+
+	public String getStatName() {
+		return statName;
+	}
+
+	public void setStatName(String statName) {
+		this.statName = statName;
+	}
+
+	public int getStatDelta() {
+		return statDelta;
+	}
+
+	public void setStatDelta(int statDelta) {
+		this.statDelta = statDelta;
+	}
 
 	
-    
+	
 }

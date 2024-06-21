@@ -1,6 +1,6 @@
 package battle;
 
-import entities.Entity;
+import entities.Entity; 
 import entities.NPC;
 import entities.Player;
 import gamestates.Battle;
@@ -19,7 +19,7 @@ public class BattleManager implements Runnable {
     private Entity[] players;
     private ArrayList<BattleState> battleStates;
     private ArrayList<BattleState> turnOrderedBattleStates;
-    private DamageCalculation damageCalc;
+    private ProcessMove damageCalc;
     private int battleType;
     
     private volatile boolean battleOver = false;
@@ -33,7 +33,7 @@ public class BattleManager implements Runnable {
     	initBattleStates();
     	
     	new InitBattleVars(this).initPlayerPos(battleType);
-        this.damageCalc = new DamageCalculation(this);
+        this.damageCalc = new ProcessMove(this);
         
         new Thread(this).start();
     }
@@ -55,18 +55,19 @@ public class BattleManager implements Runnable {
             		battleStates.get(PLAYER).setMoveTarget(PLAYER);
             	}
             	
-                // choose NPC moves - randomized for now
+                
+            	// choose NPC moves - randomized for now
             	// swap logic
                 for(BattleState bs : battleStates) {
                 	if(!bs.equals(battleStates.get(PLAYER)))
                 		if(bs.isAlive())
-                			damageCalc.randomMove(bs);
+                			MoveMethods.randomMove(this, bs);
                 
-//                	if(bs.getCurrMove().equals(Moves.SWAP)) {
-//                		bs.getEntity().swapActiveSword();
-//                		bs.getEntity().loadNormalCharacterAnimations(bs.getEntity().getBodyFileName(), bs.getEntity().getHairFileName(),
-//                				bs.getEntity().getActiveSword().getFileName(), bs.getEntity().getActiveShield().getFileName());
-//                	}
+                
+                	if(bs.getCurrMove().equals(Moves.SWAP)) {
+                		bs.getEntity().swapActiveSword();
+                		bs.getEntity().loadNormalCharacterAnimations();
+                	}
                 		
                 }
                 
@@ -80,14 +81,14 @@ public class BattleManager implements Runnable {
                 for(BattleState bs : turnOrderedBattleStates)
 		            if(!bs.getEntity().equals(battleStates.get(PLAYER).getEntity()))
 		            	if(bs.isAlive())
-		            		damageCalc.setTarget(bs);
+		            		MoveMethods.setTarget(this, bs);
                 
                 // do attacks
                 for(BattleState bs : turnOrderedBattleStates) {
                 	if(bs.isAlive()) {
-                		battle.manageAnimations(bs);
+                		battle.manageAnimations(bs, false);
                     	bs.setAnimating(true);
-                    	damageCalc.damage(bs);	
+                    	new ProcessMove(this).doMoveAction(bs);;	
                 	
 	                	while(bs.isAnimating()) {
 	                		try {
@@ -96,6 +97,12 @@ public class BattleManager implements Runnable {
 								e.printStackTrace();
 							}
 	                	}
+	                	
+	                	try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 	                	
 	                	for(BattleState bs2 : battleStates) {
                 			if(bs2.isAlive()) {
@@ -106,17 +113,20 @@ public class BattleManager implements Runnable {
 	                	}
                 	}
                 }
-	             
+	            
                 
-                // reset vars
+                battleStates.get(PLAYER).setCurrMove(Moves.NONE);
+                battleStates.get(PLAYER).setMoveTarget(-1);
+                
+                // change visual after all turns, animation changes after specific animation is in battleManager
                 for(BattleState bs : turnOrderedBattleStates) {
-                	battleLog(bs);
+                	//battleLog(bs);
+                	bs.getEntity().loadNormalCharacterAnimations();
+					bs.getEntity().loadStatChangedAnimation(bs);
                 	bs.setBlockingStance(false);
                 	bs.setDefensiveMoveQuantity(0);
                 }
                 
-                battleStates.get(PLAYER).setCurrMove(Moves.NONE);
-                battleStates.get(PLAYER).setMoveTarget(-1);
             }
         }
         
@@ -126,12 +136,14 @@ public class BattleManager implements Runnable {
     	System.out.println(bs.getEntity().getName());
     	System.out.println("speed: "+bs.getCurrSpeed());
     	System.out.println("move: "+bs.getCurrMove().getName());
-    	if(bs.getCurrMove().getAnimationType().equals("ATTACK")) {
+    	//if(bs.getCurrMove().getAnimationType().equals("ATTACK")) {
+    	if(bs.getCurrMove().getMoveType().equals("DAMAGING")) {
     		System.out.println("target: "+battleStates.get(bs.getMoveTarget()).getEntity().getName());
     		System.out.println("hits: "+bs.getCurrMove().getNumOfHits());
     		System.out.println("damage: "+bs.getCurrDamage());
     		
-    	}else if(bs.getCurrMove().getAnimationType().equals("BLOCKING")) {
+    	}else if(bs.getCurrMove().getMoveType().equals("BLOCKING")) {
+    	//}else if(bs.getCurrMove().getAnimationType().equals("BLOCKING")) {
     		System.out.println("defense counter: "+bs.getDefensiveMoveQuantity());
     	}
     	
@@ -140,6 +152,19 @@ public class BattleManager implements Runnable {
  
     private void checkIfDead(BattleState bs) {
     	if(bs.getStats()[HEALTH] <= 0) {
+    		
+    		battle.manageAnimations(bs, true);
+        	bs.setAnimating(true);
+    		bs.setAnimatingDeath(battleOver);
+        	
+    		while(bs.isAnimating()) {
+        		try {
+					Thread.sleep(250);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+        	}
+    		
     		System.out.println(bs.getEntity().getName()+" fainted");
     		bs.setAlive(false);
     	}
@@ -195,11 +220,11 @@ public class BattleManager implements Runnable {
 		this.battleType = battleType;
 	}
 
-	public DamageCalculation getDamageCalc() {
+	public ProcessMove getDamageCalc() {
 		return damageCalc;
 	}
 
-	public void setDamageCalc(DamageCalculation damageCalc) {
+	public void setDamageCalc(ProcessMove damageCalc) {
 		this.damageCalc = damageCalc;
 	}
 

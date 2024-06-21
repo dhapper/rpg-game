@@ -21,7 +21,8 @@ public class SpeedCalculation {
 		
 		for(BattleState bs : battleStates) {
 			
-			double speed = (bs.getStats()[SPEED] + bs.getEntity().getActiveSword().getSpeed()) * bs.getCurrMove().getSpeedModifier() / 10;
+			//double speed = (bs.getStats()[SPEED] + bs.getEntity().getActiveSword().getSpeed()) * bs.getCurrMove().getSpeedModifier() / 10;
+			double speed = (bs.getStats()[SPEED] + bs.getEntity().getActiveSword().getSpeed()) * bs.getCurrMove().getSpeed() / 10;
 			speed *=  0.8 + (1.2 - 0.8) * random.nextDouble();
 			bs.setCurrSpeed(speed);
 		}

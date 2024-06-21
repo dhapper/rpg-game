@@ -35,6 +35,8 @@ public class LoadSave {
 	
 	public static final String ARMOUR_M_BASIC = "ARMOUR_M_BASIC.png";
 	
+	public static final String PROTECTION_BUBBLE = "PROTECTION_BUBBLE.png";
+	
 	public static final String LAYER_MAP_Lo0_W_S_La1 = "LAYER_MAP_Lo0_W_S_La1.png";
 	public static final String LAYER_MAP_Lo0_W_S_La2 = "LAYER_MAP_Lo0_W_S_La2.png";
 	public static final String LAYER_MAP_Lo0_C_S_La1 = "LAYER_MAP_Lo0_C_S_La1.png";

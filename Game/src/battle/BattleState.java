@@ -31,6 +31,8 @@ public class BattleState {
 	private float playerX, playerY;
 	private float initialHeight;
 	
+	private boolean animatingDeath;
+	
 	private int defensiveMoveQuantity = 0;
 	
 	private boolean enemyTeam;
@@ -229,6 +231,14 @@ public class BattleState {
 
 	public void setPrevStamina(int preStamina) {
 		this.prevStamina = preStamina;
+	}
+
+	public boolean isAnimatingDeath() {
+		return animatingDeath;
+	}
+
+	public void setAnimatingDeath(boolean animatingDeath) {
+		this.animatingDeath = animatingDeath;
 	}
 	
 }
