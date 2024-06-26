@@ -1,19 +1,34 @@
 package gamestates;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
+import entities.Enemy;
+import entities.Entity;
+import entities.NPC;
 import entities.Player;
+import entities.RandomEnemy;
+import graphics.Transitions;
+import locations.ExitZone;
 import locations.LocationManager;
 import main.Game;
 import utilz.LoadSave;
+
+import static utilz.Constants.PlayerConstants.CharacterConstants.*;
 
 public class Overworld extends State implements Statemethods{
 
 	private Player player;
 	private LocationManager locationManager;
+	
+	private ArrayList<NPC> characters;
 	
 	private int xLocationOffset, yLocationOffset;
 	private int leftBorder = (int) (0.4 * Game.GAME_WIDTH);
@@ -37,7 +52,15 @@ public class Overworld extends State implements Statemethods{
 		loadLocation(1);
 	}
 	
-	private void loadLocation(int locationIndex) {
+	public void loadLocation(int locationIndex) {
+		
+		//create enemys here probably
+		if(locationIndex == 1) {
+			characters = new ArrayList<NPC>();
+			characters.add(new RandomEnemy(100, 400, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2), FACING_LEFT));
+			characters.add(new RandomEnemy(200, 600, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2), FACING_FORWARD));
+		}
+		
 		// update visuals 
 		locationManager.setCurrentLocation(locationIndex);
 		for(int index = 0; index < locationManager.getLocations().size(); index++) {
@@ -51,27 +74,169 @@ public class Overworld extends State implements Statemethods{
 						locationTilesWide = LoadSave.GetLocationData(layer)[0].length;
 						locationTilesHigh = LoadSave.GetLocationData(layer).length;
 					}
+				player.addCharacterData(characters);
 				maxTilesOffsetX = locationTilesWide - Game.TILES_IN_WIDTH;
 				maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
 				maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
 				maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
 			}
 		}
+		
 	}
 
 	private void initClasses() {
-		this.locationManager = new LocationManager(game);
-		player = new Player(100, 100, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
+		this.locationManager = new LocationManager(this);
+		player = new Player(600, 600, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
+		
+		//enemy1 = new Enemy(300, 300, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
+		//enemy2 = new Enemy(400, 400, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
 		//player.loadLocationData(locationManager.getCurrentLocation().getLayerData(0));	idk what this does, might be important
 	}
 
+	Enemy enemy;
+	ExitZone exitZone;
+	
 	@Override
 	public void update() {
 		locationManager.update();
 		player.update();
 		checkCloseToBorder();
 		
-		updatePlayerMovement();
+		if(!alertedEnemy) {
+			updatePlayerMovement();
+		}else {
+			resetKeyOrder();
+		}
+		
+		
+		//if(locationManager.getCurrentLocation().getExitZones() != null) {
+			for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
+				if(player.getHitbox().intersects(ez.getZone())) {
+					enterLocation = true;
+					resetKeyOrder();
+					exitZone = ez;
+//					ez.loadNewLocation();
+				}
+			}
+		//}
+		
+		
+		for(NPC npc : characters) {	
+			if(player.getHitbox().intersects(npc.getInteractionBox())) {
+				if(npc instanceof Enemy) {
+					enemy = (Enemy) npc;
+					if(!enemy.isAlreadyInteracted()) {
+						((Enemy) npc).setAlerted(true);
+						alertedEnemy = true;
+					}
+				}
+				//npc.interact(game);	
+			}
+		}
+		
+		
+		if(enterLocation || exitLocation) {
+			transitionTickCounter++;
+			if(transitionTickCounter > transitionDuration / 4) {
+				xPosBlackBar += xDeltaBlackBar;
+			}
+			if(transitionTickCounter > transitionDuration) {
+				xPosBlackBar = 0;
+				transitionTickCounter = 0;
+				if(enterLocation) {
+					enterLocation = false;
+					exitLocation = true;
+					exitZone.loadNewLocation();
+				}else {
+					exitLocation = false;
+				}
+			}
+		}
+		
+		if(alertedEnemy) {
+			transitionTickCounter++;
+			if(transitionTickCounter > transitionDuration / 4) {
+				xPosBlackBar += xDeltaBlackBar;
+			}
+			if(transitionTickCounter > transitionDuration) {
+				enemy.interact(game);
+				enemy.setAlreadyInteracted(true);
+				alertedEnemy = false;
+				xPosBlackBar = 0;
+				enemy.setAlerted(false);
+				transitionTickCounter = 0;
+			}
+		}
+	}
+	private boolean alertedEnemy = false, enterLocation = false, exitLocation = false;;
+	private int transitionTickCounter = 0;
+	private float xPosBlackBar = 0;
+	private float xDeltaBlackBar = 2.04f;
+	private int transitionDuration = 250;
+	
+	
+	@Override
+	public void draw(Graphics g) {
+		
+		locationManager.draw(g, xLocationOffset, yLocationOffset);
+		//player.render(g, xLocationOffset, yLocationOffset);
+		
+		
+		for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
+			g.setColor(new Color(0, 0, 255, 50));
+			g.fillRect(ez.getZone().x - xLocationOffset, ez.getZone().y - yLocationOffset, ez.getZone().width, ez.getZone().height);
+		}
+		
+		
+		ArrayList<Entity> renderOrder = new ArrayList<Entity>();
+        //ArrayList<Entity> temp = new ArrayList<Entity>();
+        renderOrder.add(player);
+        for(NPC npc : characters) {
+            renderOrder.add(npc);
+        }
+        
+        // Define a comparator to sort by getY()
+        Comparator<Entity> comparator = new Comparator<Entity>() {
+            @Override
+            public int compare(Entity e1, Entity e2) {
+                return Double.compare(e1.getHitbox().getY(), e2.getHitbox().getY());
+            }
+        };
+        
+        // Sort temp by getY() values
+        Collections.sort(renderOrder, comparator);
+		
+		
+        for (Entity e : renderOrder) {
+            if (e instanceof Player) {
+                // Perform actions specific to Player
+                Player player = (Player) e;
+                player.render(g, xLocationOffset, yLocationOffset);
+                // Add any other player-specific logic here
+            } else if (e instanceof NPC) {
+                // Perform actions specific to Enemy
+                Enemy enemy = (Enemy) e;
+                enemy.render(g, xLocationOffset, yLocationOffset);
+                // Add any other enemy-specific logic here
+            } 
+		}
+        
+        for(NPC npc : characters) {
+        	if (npc instanceof Enemy) {
+        		if(((Enemy) npc).isAlerted()) {
+					g.drawImage(LoadSave.GetResource(LoadSave.EXCLAMATION_INDICATOR), (int) npc.getHitbox().getCenterX() - xLocationOffset - 20,
+							(int) npc.getHitbox().y - yLocationOffset - 120, 40, 40, null);
+				}		
+				//npc.interact(game);	
+			}
+		}
+        
+        if(alertedEnemy || enterLocation) {
+        	Transitions.closeCurtains(g, xPosBlackBar);
+        }else if(exitLocation) {
+        	Transitions.openCurtains(g, xPosBlackBar);
+        }
+        
 	}
 
 	private void checkCloseToBorder() {
@@ -103,13 +268,6 @@ public class Overworld extends State implements Statemethods{
 		else if(yLocationOffset < 0)
 			yLocationOffset = 0;
 		
-		
-	}
-
-	@Override
-	public void draw(Graphics g) {
-		locationManager.draw(g, xLocationOffset, yLocationOffset);
-		player.render(g, xLocationOffset, yLocationOffset);
 		
 	}
 
@@ -175,8 +333,20 @@ public class Overworld extends State implements Statemethods{
  		}
 	}
 	
+	public void resetKeyOrder() {
+		player.setUp(false);
+	    player.setDown(false);
+	    player.setLeft(false);
+	    player.setRight(false);
+		keyOrder.clear();
+	}
+	
 	@Override
 	public void keyPressed(KeyEvent e) {
+		
+		if(enterLocation || exitLocation)
+			return;
+		
 		switch(e.getKeyCode()) {
 		case KeyEvent.VK_W:
 			upPressed = true;
@@ -207,13 +377,27 @@ public class Overworld extends State implements Statemethods{
 			break;
 		
 		case KeyEvent.VK_B:
-			game.createBattle();
-			GameState.state = GameState.BATTLE;
+			//game.createBattle();
+			//GameState.state = GameState.BATTLE;
+			break;
+			
+		case KeyEvent.VK_M:
+			GameState.state = GameState.MENU;
 			break;
 			
 		case KeyEvent.VK_ENTER:
-			GameState.state = GameState.MENU;
+			
+			for(NPC npc : characters)
+				if(player.getHitbox().intersects(npc.getInteractionBox())) {
+					npc.interact(game);
+			
+//			if(player.getHitbox().intersects(characters.get(0).getInteractionBox())) {
+//				System.out.println("Asdads");
+//			}
+			//System.out.println(player.getHitbox().getCenterX() + " " + player.getHitbox().getCenterX());
+			//System.out.println(characters.get(0).getInteractionBox().getCenterX() + " " + characters.get(0).getInteractionBox().getCenterY());
 			break;
+			}
 		}
 		
 	}
@@ -252,4 +436,14 @@ public class Overworld extends State implements Statemethods{
 	public LocationManager getLocationManager() {
 		return locationManager;
 	}
+
+	public ArrayList<NPC> getCharacters() {
+		return characters;
+	}
+
+	public void setCharacters(ArrayList<NPC> characters) {
+		this.characters = characters;
+	}
+	
+	
 }

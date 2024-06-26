@@ -2,20 +2,22 @@ package utilz;
 
 import java.util.ArrayList;
 
+import entities.NPC;
+import gamestates.Overworld;
 import main.Game;
 
 public class HelpMethods {
 
-	public static boolean CanMoveHere(float x, float y, float width, float height, ArrayList<int[][]> layersData) {
-		if(!IsSolid(x, y, layersData))
-			if(!IsSolid(x + width, y + height , layersData))
-				if(!IsSolid(x + width, y , layersData))
-					if(!IsSolid(x, y + height, layersData))
+	public static boolean CanMoveHere(float x, float y, float width, float height, ArrayList<int[][]> layersData, ArrayList<NPC> characters) {
+		if(!IsSolid(x, y, layersData, characters))
+			if(!IsSolid(x + width, y + height , layersData, characters))
+				if(!IsSolid(x + width, y , layersData, characters))
+					if(!IsSolid(x, y + height, layersData, characters))
 						return true;
 		return false;
 	}
 	
-	private static boolean IsSolid(float x, float y, ArrayList<int[][]> layersData) {
+	private static boolean IsSolid(float x, float y, ArrayList<int[][]> layersData, ArrayList<NPC> characters) {
 		
 		int maxWidth = layersData.get(0)[0].length * Game.TILES_SIZE;
 		int maxHeight = layersData.get(0).length * Game.TILES_SIZE;
@@ -30,6 +32,11 @@ public class HelpMethods {
 		for(int[][] layer : layersData) {
 			int value = layer[(int) yIndex][(int) xIndex];
 			if(value != 24)
+				return true;
+		}
+		
+		for(NPC npc : characters) {
+			if(npc.getHitbox().contains(x, y))
 				return true;
 		}
 		

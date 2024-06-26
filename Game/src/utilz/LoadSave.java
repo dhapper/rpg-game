@@ -20,8 +20,11 @@ public class LoadSave {
 	
 	public static final String SHADOW = "SHADOW.png";
 	
-	public static final String SKINTONE_0 = "SKINTONE_0.png";
-	public static final String SKINTONE_1 = "SKINTONE_1.png";
+	public static final String BASE_PLAYER_MODEL = "PLAYER_BASE.png";
+//	public static final String SKINTONE_0 = "SKINTONE_0.png";
+//	public static final String SKINTONE_1 = "SKINTONE_1.png";
+	
+	public static final String EYES = "EYES.png";
 	
 	public static final String HAIR_BOY_0 = "HAIR_BOY_0.png";
 	
@@ -49,7 +52,11 @@ public class LoadSave {
 	public static final String LAYER_MAP_Lo1_C_A_La1 = "LAYER_MAP_Lo1_C_A_La1.png";
 	public static final String LAYER_MAP_Lo1_W_A_La1 = "LAYER_MAP_Lo1_W_A_La1.png";
 	
+	//public static final String LAYER_MAP_Lo1_C_S_La2 = "LAYER_MAP_Lo1_C_S_La2.png";
+	
 	public static final ArrayList<String> LAYER_MAPS = new ArrayList<String>();
+	
+	public static final String EXCLAMATION_INDICATOR = "EXCLAMATION_INDICATOR.png";
 	
 	static {
         // Add layer map strings to LAYER_MAPS
@@ -64,6 +71,7 @@ public class LoadSave {
         LAYER_MAPS.add(LAYER_MAP_Lo1_C_S_La1);
         LAYER_MAPS.add(LAYER_MAP_Lo1_C_A_La1);
         LAYER_MAPS.add(LAYER_MAP_Lo1_W_A_La1);
+        //LAYER_MAPS.add(LAYER_MAP_Lo1_C_S_La2);
     }
 
 	public static final String SPRITESHEET_W_S_La1 = "SPRITESHEET_W_S_La1.png";
@@ -71,6 +79,8 @@ public class LoadSave {
 	public static final String SPRITESHEET_C_S_La1 = "SPRITESHEET_C_S_La1.png";
 	public static final String SPRITESHEET_C_A_La1 = "SPRITESHEET_C_A_La1.png";
 	public static final String SPRITESHEET_W_A_La1 = "SPRITESHEET_W_A_La1.png";
+	
+	//public static final String SPRITESHEET_C_S_La2 = "SPRITESHEET_C_S_La2.png";
 	
 	public static BufferedImage GetResource(String fileName) {
 		BufferedImage img = null;

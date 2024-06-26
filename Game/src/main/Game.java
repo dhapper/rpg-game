@@ -1,7 +1,9 @@
 package main;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 
+import entities.Entity;
 import entities.Player;
 import gamestates.Battle;
 import gamestates.GameState;
@@ -46,10 +48,9 @@ public class Game implements Runnable{
 		//battle = new Battle(this);
 	}
 	
-	int i = 0;
-	public void createBattle() {
-		i++;
-		battle = new Battle(this);
+	public void createBattle(ArrayList<Entity> players, int battleType) {
+		players.add(0, overworld.getPlayer());
+		battle = new Battle(this, players, battleType);
 	}
 
 	private void startGameLoop() {

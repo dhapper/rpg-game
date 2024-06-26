@@ -22,8 +22,11 @@ public class Constants {
 				public static final int X_OFFSET_LEFT = (int) (200 * Game.SCALE);
 				public static final int X_OFFSET_RIGHT = Game.GAME_WIDTH - X_OFFSET_LEFT - PLAYER_SCALE;
 				public static final int Y_OFFSET_MAIN = (int) (165 * Game.SCALE);;
-				public static final int Y_OFFSET_HIGHER = (int) (116 * Game.SCALE);
-				public static final int Y_OFFSET_LOWER = (int) (216 * Game.SCALE);;
+				public static final int Y_OFFSET_HIGHER = (int) ((116 - 20) * Game.SCALE);
+				public static final int Y_OFFSET_LOWER = (int) ((216 + 20) * Game.SCALE);
+				
+				public static final int Y_DIFF_SHORT = Y_OFFSET_LOWER - Y_OFFSET_MAIN;
+				public static final int Y_DIFF_LONG = Y_OFFSET_LOWER - Y_OFFSET_HIGHER;
 			}
 			
 			public static class Bars{
@@ -183,6 +186,12 @@ public class Constants {
 			public static int HITBOX_HEIGHT = (int) (8 * Game.SCALE * PLAYER_SCALE);
 			
 			public static final float PLAYER_SPEED = 1f * Game.SCALE;
+		}
+		
+		public static class CharacterConstants{
+			public static final int FACING_RIGHT = 0;
+			public static final int FACING_FORWARD = 1;
+			public static final int FACING_LEFT = 0;
 		}
 		
 		public static final int IDLE = 0;

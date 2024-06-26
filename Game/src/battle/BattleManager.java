@@ -16,7 +16,7 @@ import java.util.Comparator;
 public class BattleManager implements Runnable {
 
 	private Battle battle;
-    private Entity[] players;
+	private ArrayList<Entity> players;//private Entity[] players;
     private ArrayList<BattleState> battleStates;
     private ArrayList<BattleState> turnOrderedBattleStates;
     private ProcessMove damageCalc;
@@ -24,7 +24,7 @@ public class BattleManager implements Runnable {
     
     private volatile boolean battleOver = false;
     
-    public BattleManager(Battle battle, Entity[] players, int battleType) {
+    public BattleManager(Battle battle, ArrayList<Entity> players, int battleType) {
     	this.battle = battle;
     	this.players = players;
     	this.battleType = battleType;
@@ -58,18 +58,10 @@ public class BattleManager implements Runnable {
                 
             	// choose NPC moves - randomized for now
             	// swap logic
-                for(BattleState bs : battleStates) {
+                for(BattleState bs : battleStates)
                 	if(!bs.equals(battleStates.get(PLAYER)))
                 		if(bs.isAlive())
                 			MoveMethods.randomMove(this, bs);
-                
-                
-                	if(bs.getCurrMove().equals(Moves.SWAP)) {
-                		bs.getEntity().swapActiveSword();
-                		bs.getEntity().loadNormalCharacterAnimations();
-                	}
-                		
-                }
                 
                 // calculate speeds and order turns
                 new SpeedCalculation(this, battleStates).calcSpeed();;
@@ -174,28 +166,33 @@ public class BattleManager implements Runnable {
     private void checkBattleOver() {
     	
         if(!battleStates.get(PLAYER).isAlive()) {
-            GameState.state = GameState.OVERWORLD;
+        	battleOver = true;
+            //GameState.state = GameState.OVERWORLD;
             return;
         }
         
         switch(battleType) {
         case ONE_VS_ONE:
         	if(!battleStates.get(NPC_1).isAlive())
-        		GameState.state = GameState.OVERWORLD;
+        		battleOver = true;
+        		//GameState.state = GameState.OVERWORLD;
         	break;
         case TWO_VS_ONE:
         	if(!battleStates.get(NPC_2).isAlive())
-        		GameState.state = GameState.OVERWORLD;
+        		battleOver = true;
+        		//GameState.state = GameState.OVERWORLD;
         	break;
         case ONE_VS_TWO:
         	if(!battleStates.get(NPC_1).isAlive())
         		if(!battleStates.get(NPC_2).isAlive())
-        			GameState.state = GameState.OVERWORLD;
+        			battleOver = true;
+        			//GameState.state = GameState.OVERWORLD;
         	break;
         case TWO_VS_TWO:
         	if(!battleStates.get(NPC_2).isAlive())
         		if(!battleStates.get(NPC_3).isAlive())
-        			GameState.state = GameState.OVERWORLD;
+        			battleOver = true;
+        			//GameState.state = GameState.OVERWORLD;
         	break;
         }
     }
@@ -230,6 +227,10 @@ public class BattleManager implements Runnable {
 
 	public Battle getBattle() {
 		return battle;
+	}
+
+	public boolean isBattleOver() {
+		return battleOver;
 	}
 
 	// Method to get sorted BattleState list by currSpeed in descending order

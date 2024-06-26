@@ -21,9 +21,11 @@ import battle.Move;
 import battle.MoveMethods;
 import entities.Enemy;
 import entities.Entity;
+import entities.RandomEnemy;
 import entities.Sword;
 import graphics.DrawBattle;
 import graphics.GraphicsHelp;
+import graphics.Transitions;
 import main.Game;
 import ui.AltBattleButton;
 import ui.BattleButton;
@@ -35,8 +37,6 @@ import utilz.Constants;
 import utilz.LoadSave;
 
 public class Battle extends State implements Statemethods{
-
-	private Enemy test, test2, test3;
 	
 	private BattleManager battleManager;
 	private DrawBattle drawBattle;
@@ -69,17 +69,14 @@ public class Battle extends State implements Statemethods{
 	
 	private String moveErrorMessage = "NONE";
 	
+	ArrayList<Entity> players;
 	
-	public Battle(Game game) {
+	public Battle(Game game, ArrayList<Entity> players, int battleType) {
 		super(game);
+		game.getOverworld().resetKeyOrder();
 		
-		
-		this.test = new Enemy(300, 300, 100, 100);
-		this.test2 = new Enemy(300, 300, 100, 100);
-		this.test3 = new Enemy(300, 300, 100, 100);
-		
-		Entity players[] = {game.getOverworld().getPlayer(), test, test2, test3};
-		this.battleManager = new BattleManager(this, players, TWO_VS_TWO);
+		this.players = players;
+		this.battleManager = new BattleManager(this, players, battleType);
 		this.drawBattle = new DrawBattle(this);
 		this.player = battleManager.getBattleStates().get(PLAYER);
 		this.moves = player.getEntity().getActiveSword().getActiveMoves();
@@ -94,11 +91,25 @@ public class Battle extends State implements Statemethods{
 
 	@Override
 	public void update() {
+		
+		if(battleManager.isBattleOver())
+			return;
+		
 		updateAniTick();
+		
+		if(battleTransition) {
+			transitionTickCounter++;
+			if(transitionTickCounter > transitionDuration / 4) {
+				xPosBlackBar += xDeltaBlackBar;
+			}
+			if(transitionTickCounter > transitionDuration) {
+				battleTransition = false;
+			}
+			return;
+		}
 		
 		for (Button b : buttons)
 			b.update();
-
 	}
 	
 	
@@ -127,19 +138,23 @@ public class Battle extends State implements Statemethods{
 		if(!moveErrorMessage.equals("NONE"))
 			drawBattle.drawMoveErrorMessage(g, moveErrorMessage);
 		
-		for(HoveringRect hr : hoveringPlayerButtons) {
-			if(hr.isMouseOver())
-				drawBattle.drawPlayerInfoPanel(g, hr.getBattleState());
-		}
+		if(!battleManager.isBattleOver())
+			for(HoveringRect hr : hoveringPlayerButtons) {
+				if(hr.getBattleState().isAlive())
+					if(hr.isMouseOver())
+						drawBattle.drawPlayerInfoPanel(g, hr.getBattleState());
+			}
 		
 		
 		// buttons
 		if(updatingTargetButtons) 
 			for (TargetButton tb : targetButtons) 
 				if(tb.getBattleState().isAlive())
-					if(player.getCurrMove().getTarget().equals("ENEMY"))
-						if(tb.getBattleState().isEnemyTeam())
-							tb.draw(g);
+					if(player.getCurrMove().getTarget() != null)				// temp fix
+						if(player.getCurrMove().getTarget().equals("ENEMY"))	//Cannot invoke "String.equals(Object)" because
+																				//the return value of "battle.Move.getTarget()" is null
+							if(tb.getBattleState().isEnemyTeam())
+								tb.draw(g);
 		
 		for (BattleButton bb : battleButtons)
 			bb.draw(g);
@@ -147,16 +162,55 @@ public class Battle extends State implements Statemethods{
 		for(AltBattleButton abb : altBattleButtons)
 			abb.draw(g);
 		
+		if(battleManager.isBattleOver()) {
+			g.setColor(new Color(0, 0, 0, 150));
+			g.fillRect(0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT);
+			
+//			String resultMessage = "You fainted...";
+//			FontMetrics metrics = g.getFontMetrics();
+//			int textWidth = metrics.stringWidth(resultMessage);
+//			g.setColor(Color.YELLOW);
+			
+			g.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, 100));
+			if(player.isAlive()) {
+				GraphicsHelp.BorderedText(GraphicsHelp.AddSpaces("YOU WON!"), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT / 4, Color.GREEN, Color.BLACK, 2, (Graphics2D )g);
+				g.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, 50));
+				GraphicsHelp.BorderedText(GraphicsHelp.AddSpaces("BATTLE EARNINGS: +300 COINS"), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT / 2, Color.YELLOW, Color.BLACK, 2, (Graphics2D )g);
+				GraphicsHelp.BorderedText(GraphicsHelp.AddSpaces("PARTNER RECEIVES 25% (-75 COINS)"), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT / 2 + 50, Color.YELLOW, Color.BLACK, 2, (Graphics2D )g);
+				g.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, 30));
+				GraphicsHelp.BorderedText(GraphicsHelp.AddSpaces("PRESS ANY BUTTON TO CONTINUE"), Game.GAME_WIDTH / 2, Game.GAME_HEIGHT * 3 / 4, Color.ORANGE, Color.BLACK, 2, (Graphics2D )g);
+			}else {
+				//GraphicsHelp.BorderedText("You Fainted...", Game.GAME_WIDTH / 2, Game.GAME_HEIGHT / 4, Color.YELLOW, Color.BLACK, 2, (Graphics2D )g);
+			}
+		}
+		
+		
+		if(battleTransition)
+			Transitions.openCurtains(g, xPosBlackBar);
+			
+		
+//		g.setColor(Color.BLACK);
+//        if(battleTransition) {
+//        	g.fillRect(0, (int) (-xDeltaBlackBar), Game.GAME_WIDTH, Game.GAME_HEIGHT / 2);
+//        	g.fillRect(0, (int) (Game.GAME_HEIGHT / 2 + xDeltaBlackBar), Game.GAME_WIDTH, Game.GAME_HEIGHT / 2);
+//        }
 	}
-	
+	private boolean battleTransition = true;
+	private int transitionTickCounter = 0;
+	private float xPosBlackBar = 0;
+	private float xDeltaBlackBar = 2.04f;
+	private int transitionDuration = 250;
 	
 	private void loadButtons() {
 		
-		battleButtons.add(new BattleButton(moves[0], Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4));
-		battleButtons.add(new BattleButton(moves[1], Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4));
+		int buttonY1 = Game.GAME_HEIGHT*4/5;
+		int buttonY2 = buttonY1 + Constants.UI.BattleButton.B_HEIGHT;
+		
+		battleButtons.add(new BattleButton(moves[0], Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, buttonY1));
+		battleButtons.add(new BattleButton(moves[1], Game.GAME_WIDTH / 2, buttonY1));
 		battleButtons.add(new BattleButton(moves[2],
-				Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4 + Constants.UI.BattleButton.B_HEIGHT));
-		battleButtons.add(new BattleButton(moves[3], Game.GAME_WIDTH / 2, Game.GAME_HEIGHT*3/4 + Constants.UI.BattleButton.B_HEIGHT));
+				Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH, buttonY2));
+		battleButtons.add(new BattleButton(moves[3], Game.GAME_WIDTH / 2, buttonY2));
 		
 		for(BattleState bs : battleManager.getBattleStates()) {
 			hoveringPlayerButtons.add(new HoveringRect((int)bs.getPlayerX() + Constants.UI.TargetButton.X_OFFSET,
@@ -169,8 +223,8 @@ public class Battle extends State implements Statemethods{
 		}
 		
 		altBattleButtons.add(new AltBattleButton("SWAP",
-				Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH - Constants.UI.AltBattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4, SWAP));
-		altBattleButtons.add(new AltBattleButton("FF", Game.GAME_WIDTH / 2 + Constants.UI.BattleButton.B_WIDTH, Game.GAME_HEIGHT*3/4, FF));
+				Game.GAME_WIDTH / 2 - Constants.UI.BattleButton.B_WIDTH - Constants.UI.AltBattleButton.B_WIDTH, buttonY1, SWAP));
+		altBattleButtons.add(new AltBattleButton("FF", Game.GAME_WIDTH / 2 + Constants.UI.BattleButton.B_WIDTH, buttonY1, FF));
 		
 		
 		
@@ -239,7 +293,8 @@ public class Battle extends State implements Statemethods{
 				playerAction = BATTLE_IDLE;
 				animationArrayIndex = playerAction;
 				for(BattleState bs : battleManager.getBattleStates()) {
-					battleManager.getBattleStates().get(bs.getMoveTarget()).setPrevHealth(battleManager.getBattleStates().get(bs.getMoveTarget()).getStats()[HEALTH]);
+					battleManager.getBattleStates().get(bs.getMoveTarget()).setPrevHealth(battleManager.getBattleStates()
+							.get(bs.getMoveTarget()).getStats()[HEALTH]);
 					bs.setPrevStamina(bs.getStats()[STAMINA]);
 					bs.setAnimating(false);
 					bs.setAnimatingDeath(false);
@@ -344,15 +399,24 @@ public class Battle extends State implements Statemethods{
 	}
 	
 	public float checkHeights(BattleState attacker) {
+		float ySpeed = 0.64f;
+		
 		BattleState target = battleManager.getBattleStates().get(attacker.getMoveTarget());
-		if(attacker.getInitialHeight() == target.getInitialHeight() - 75)
-			return 0.45f;
-		else if(attacker.getInitialHeight() == target.getInitialHeight() - 150)
-			return 0.9f;
-		else if(attacker.getInitialHeight() == target.getInitialHeight() + 75)
-			return -0.45f;
-		else if(attacker.getInitialHeight() == target.getInitialHeight() + 150)
-			return -0.9f;
+		
+//		if(attacker.getEntity().getName() == "dhaarsh") {
+//			System.out.println(attacker.getInitialHeight()+" "+target.getInitialHeight());
+//			System.out.println(target.getInitialHeight() - Constants.BattleConstants.Graphics.Players.Y_DIFF_SHORT);
+//		}
+		
+		//not working because not properly calced
+		if(attacker.getInitialHeight() == target.getInitialHeight() - 103)
+			return ySpeed;
+		else if(attacker.getInitialHeight() == target.getInitialHeight() - Constants.BattleConstants.Graphics.Players.Y_DIFF_LONG)
+			return ySpeed * 2;
+		else if(attacker.getInitialHeight() == target.getInitialHeight() + Constants.BattleConstants.Graphics.Players.Y_DIFF_SHORT)
+			return -ySpeed;
+		else if(attacker.getInitialHeight() == target.getInitialHeight() + Constants.BattleConstants.Graphics.Players.Y_DIFF_LONG)
+			return -(ySpeed * 2);
 		else
 			return 0;
 	}
@@ -364,6 +428,10 @@ public class Battle extends State implements Statemethods{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		
+		if(battleManager.isBattleOver())
+			return;
+		
 		if(updatingBattleButtons) {
 			for (BattleButton bb : battleButtons) {
 				if(isIn(e, bb)) {	
@@ -394,8 +462,16 @@ public class Battle extends State implements Statemethods{
 		
 	}
 	
+	private void returnToOverworld() {
+		GameState.state = GameState.OVERWORLD;
+	}
+	
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		
+		if(battleManager.isBattleOver())
+			returnToOverworld();
+		
 		if(updatingBattleButtons) {
 			for (BattleButton bb : battleButtons) {
 				if(isIn(e, bb)) {
@@ -430,7 +506,7 @@ public class Battle extends State implements Statemethods{
 						if(abb.equals(altBattleButtons.get(SWAP))) {
 							player.setCurrMove(Moves.SWAP);
 						}else if(abb.equals(altBattleButtons.get(FF))) {
-							GameState.state = GameState.OVERWORLD;
+							returnToOverworld();
 						}
 					}
 				}
@@ -447,7 +523,6 @@ public class Battle extends State implements Statemethods{
 						}else if(tb.equals(targetButtons.get(1))) {
 							player.setMoveTarget(NPC_2);
 						}else if(tb.equals(targetButtons.get(2))) {
-							System.out.println("asd");
 							player.setMoveTarget(NPC_3);
 						}
 						
@@ -488,13 +563,14 @@ public class Battle extends State implements Statemethods{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_B)
-			GameState.state = GameState.OVERWORLD;
+			returnToOverworld();
 			
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
+		if(battleManager.isBattleOver())
+			returnToOverworld();
 		
 	}
 

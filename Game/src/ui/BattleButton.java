@@ -52,31 +52,31 @@ public class BattleButton extends Button {
 		
 		imgs[0] = new BufferedImage(B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = imgs[0].createGraphics();
-        g2d.setFont(GraphicsHelp.loadCustomFont(PIXEL_FONT, Math.min(35 - moveName.length(), 20)));
+        g2d.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, Math.min(35 - moveName.length(), 20)));
         //g2d.setFont(new Font("ARIEL", Font.BOLD, 16));
         g2d.setColor(new Color(red, green, blue));
         g2d.fillRect(0, 0, defaultWidth - 1, defaultHeight - 1);
-        GraphicsHelp.centeredText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, g2d);
+        GraphicsHelp.CenteredText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, g2d);
         g2d.drawRect(0, 0, defaultWidth - 1, defaultHeight - 1);
         
         
         imgs[1] = new BufferedImage(B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT, BufferedImage.TYPE_INT_ARGB);
         g2d = imgs[1].createGraphics();
         //g2d.setFont(new Font("ARIEL", Font.BOLD, 16));
-        g2d.setFont(GraphicsHelp.loadCustomFont(PIXEL_FONT, Math.min(35 - moveName.length(), 20)));
+        g2d.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, Math.min(35 - moveName.length(), 20)));
         g2d.setColor(new Color(red + 20, green + 20, blue + 20));
         g2d.fillRect(0, 0, defaultWidth - 1, defaultHeight - 1);
-        GraphicsHelp.centeredText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, g2d);
+        GraphicsHelp.CenteredText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, g2d);
         g2d.drawRect(0, 0, defaultWidth - 1, defaultHeight - 1);
         
         
         imgs[2] = new BufferedImage(B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT, BufferedImage.TYPE_INT_ARGB);
         g2d = imgs[2].createGraphics();
         //g2d.setFont(new Font("ARIEL", Font.BOLD, 16));
-        g2d.setFont(GraphicsHelp.loadCustomFont(PIXEL_FONT, Math.min(35 - moveName.length(), 20)));
+        g2d.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, Math.min(35 - moveName.length(), 20)));
         g2d.setColor(new Color(red - 20, green - 20, blue - 20));
         g2d.fillRect(0, 0, defaultWidth - 1, defaultHeight - 1);
-        GraphicsHelp.centeredText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, g2d);
+        GraphicsHelp.CenteredText(moveName, B_WIDTH_DEFAULT / 2, B_HEIGHT_DEFAULT / 2, Color.BLACK, g2d);
         g2d.drawRect(0, 0, defaultWidth - 1, defaultHeight - 1);
         
         // Dispose the Graphics2D object

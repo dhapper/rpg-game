@@ -4,12 +4,14 @@ import static utilz.Constants.PlayerConstants.PlayerDimensions.*;
 import static utilz.Constants.PlayerConstants.*;
 import static utilz.HelpMethods.CanMoveHere;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import utilz.LoadSave;
+import graphics.ColourChanger;
 import graphics.GraphicsHelp;
 
 public class Player extends Entity {
@@ -20,6 +22,7 @@ public class Player extends Entity {
 	private boolean moving = false;
 	private boolean left, up, right, down;
 	private ArrayList<int[][]> layersData = new ArrayList<int[][]>();
+	private ArrayList<NPC> charactersData = new ArrayList<NPC>();
 
 	private int prevAni = -1;
 	private boolean facingRight = true, facingLeft = false, facingForward = false, facingBackward = false;
@@ -28,6 +31,7 @@ public class Player extends Entity {
 	protected ArrayList<Shield> shields;
 	protected ArrayList<Armour> armoury;
 	
+	
 	public Player(float x, float y, int width, int height) {
 		super(x, y, width, height);
 		initHitbox(x, y, HITBOX_WIDTH, HITBOX_HEIGHT);
@@ -35,7 +39,7 @@ public class Player extends Entity {
 		this.name = "dhaarsh";
 		
 		this.health = 500;
-		this.strength = 20;
+		this.strength = 80;
 		this.speed = 20;
 		this.stamina = 50;
 		this.evasiveness = 5;
@@ -64,15 +68,27 @@ public class Player extends Entity {
 		this.armoury.add(activeArmour);
 		
 		
-		this.bodyFileName = LoadSave.SKINTONE_0;
-		this.hairFileName = LoadSave.HAIR_BOY_0;
+		this.bodyFileName = LoadSave.BASE_PLAYER_MODEL;
+		this.hairstyleFileName = LoadSave.HAIR_BOY_0;
+		this.hairRGB[0] = 150;
+		this.hairRGB[1] = 100;
+		this.hairRGB[2] = 220;
+		this.pupilColour = Color.BLACK;
+		this.scleraColour = Color.WHITE;
+		this.skinToneIndex = 0;
 		
+		preLoad();
 		loadAnimations();
 	}
 
 	public void update() {
 		updatePos();
 		updateAniTick();
+	}
+	
+	public void setPlayerPos(int x, int y) {
+		hitbox.x = x;
+		hitbox.y = y;
 	}
 	
 	public void render(Graphics g, int xOffset, int yOffset) {
@@ -173,7 +189,7 @@ public class Player extends Entity {
 			playerAction = WALKING_TOWARDS;
 		}
 		
-		if(CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, layersData)) {
+		if(CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, layersData, charactersData)) {
 			hitbox.x += xSpeed;
 			hitbox.y += ySpeed;
 			moving = true;
@@ -194,7 +210,9 @@ public class Player extends Entity {
 
 	}
 	
-	
+	public void addCharacterData(ArrayList<NPC> characters) {
+		this.charactersData = characters;
+	}
 	
 	public void addLocationData(String fileName) {
 		layersData.add(LoadSave.GetLocationData(fileName));
@@ -255,9 +273,5 @@ public class Player extends Entity {
 	public ArrayList<Armour> getArmoury() {
 		return armoury;
 	}
-
-	
-	
-	
 	
 }

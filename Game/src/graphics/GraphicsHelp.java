@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class GraphicsHelp {
 	
-	public static Font loadCustomFont(String path, float size) {
+	public static Font LoadCustomFont(String path, float size) {
 		try {
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File(path));
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -26,7 +26,7 @@ public class GraphicsHelp {
         }
 	}
 	
-	public static void borderedText(String text, int x, int y, Color letter, Color border, int borderSize, Graphics2D g) {
+	public static void BorderedText(String text, int x, int y, Color letter, Color border, int borderSize, Graphics2D g) {
 		FontMetrics metrics = g.getFontMetrics(g.getFont());
 		
 		x -= metrics.stringWidth(text) / 2;
@@ -42,7 +42,7 @@ public class GraphicsHelp {
 		g.drawString(text, x, y);
 	}
 	
-	public static void centeredText(String text, int x, int y, Color letter, Graphics2D g) {
+	public static void CenteredText(String text, int x, int y, Color letter, Graphics2D g) {
 		FontMetrics metrics = g.getFontMetrics(g.getFont());
 		
 		x -= metrics.stringWidth(text) / 2;
@@ -67,7 +67,7 @@ public class GraphicsHelp {
 		return null;
 	}
 	
-	public static BufferedImage decreaseAlpha(BufferedImage image, float alphaDecreaseFactor) {
+	public static BufferedImage DecreaseAlpha(BufferedImage image, float alphaDecreaseFactor) {
 	    int width = image.getWidth();
 	    int height = image.getHeight();
 	    BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -86,5 +86,18 @@ public class GraphicsHelp {
 	    }
 	    return newImage;
 	}
+	
+	public static String AddSpaces(String input) {
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < input.length(); i++) {
+            result.append(input.charAt(i));
+            if (i < input.length() - 1) {
+                result.append(' ');
+            }
+        }
+
+        return result.toString();
+    }
 
 }

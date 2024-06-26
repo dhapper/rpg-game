@@ -115,7 +115,7 @@ public class DrawInventoryUI {
 			g.fillRect(tb.getxPos() - BORDER_WIDTH / 2, tb.getyPos() - BORDER_WIDTH / 2, B_WIDTH + BORDER_WIDTH, B_HEIGHT + BORDER_WIDTH);
 		}
 		
-		g.setFont(GraphicsHelp.loadCustomFont(Constants.GraphicsConstants.PIXEL_FONT, Game.GAME_WIDTH/15));
+		g.setFont(GraphicsHelp.LoadCustomFont(Constants.GraphicsConstants.PIXEL_FONT, Game.GAME_WIDTH/15));
 		g.drawString("INVENTORY", (int) (165 * Game.SCALE), (int) (65 * Game.SCALE));
 		
 	}

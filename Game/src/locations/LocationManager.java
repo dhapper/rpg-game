@@ -4,13 +4,14 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import gamestates.Overworld;
 import graphics.Animation;
 import main.Game;
 import utilz.LoadSave;
 
 public class LocationManager {
 
-	private Game game;
+	//private Game game;
 	//private Location locationOne;
 	private ArrayList<Location> locations;
 	private BufferedImage[] spriteMapLayer1, spriteMapLayer2, spriteMapLayer3, spriteMapLayer4, spriteMapLayer5;
@@ -19,8 +20,8 @@ public class LocationManager {
 	private ArrayList<ArrayList<Animation>> animationsList;
 	private ArrayList<Animation> animations;
 	
-	public LocationManager(Game game) {
-		this.game = game;
+	public LocationManager(Overworld overworld) {
+		//this.game = game;
 		this.animationsList = new ArrayList<ArrayList<Animation>>();
 		this.locations = new ArrayList<Location>();
 		
@@ -29,10 +30,19 @@ public class LocationManager {
 		loadAnimations(LoadSave.SPRITESHEET_W_A_La1);
 		//locationOne = new Location(1);
 		
-		locations.add(new Location(0));
-		locations.add(new Location(1));
+		//System.out.println(game);
+		//System.out.println(game.getOverworld());
+		
+		locations.add(new Location(overworld, 0));
+		locations.add(new Location(overworld, 1));
 		currLocation = locations.get(1);
 	}
+	
+//	private void loadCharacters(int locationIndex) {
+//		if(locationIndex == 1) {
+//			
+//		}
+//	}
 	
 	private void importLocationSprites() {
 		BufferedImage spriteSheetLayer1 = LoadSave.GetResource(LoadSave.SPRITESHEET_W_S_La1);
@@ -40,6 +50,8 @@ public class LocationManager {
 		BufferedImage spriteSheetLayer3 = LoadSave.GetResource(LoadSave.SPRITESHEET_C_S_La1);
 		BufferedImage spriteSheetLayer4 = LoadSave.GetResource(LoadSave.SPRITESHEET_C_A_La1);
 		BufferedImage spriteSheetLayer5 = LoadSave.GetResource(LoadSave.SPRITESHEET_W_A_La1);
+		
+		//BufferedImage spriteSheetLayer6 = LoadSave.GetResource(LoadSave.SPRITESHEET_C_S_La2);
 		
 		spriteMapLayer1 = new BufferedImage[25];
 		spriteMapLayer2 = new BufferedImage[25];
@@ -77,6 +89,7 @@ public class LocationManager {
 				int index3 = currLocation.getSpriteIndex(2, j, i);
 				int index4 = currLocation.getSpriteIndex(3, j, i);
 				int index5 = currLocation.getSpriteIndex(4, j, i);
+				//int index6 = currLocation.getSpriteIndex(5, j, i);
 				g.drawImage(spriteMapLayer1[index1], i * Game.TILES_SIZE - xOffset, j * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
 				g.drawImage(spriteMapLayer2[index2], i * Game.TILES_SIZE - xOffset, j * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
 				g.drawImage(spriteMapLayer3[index3], i * Game.TILES_SIZE - xOffset, j * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);

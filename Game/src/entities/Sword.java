@@ -20,10 +20,10 @@ public class Sword extends Item{
 		this.fileName = fileName;
 		
 		activeMoves = new Move[4];
-		activeMoves[0] = new Move("SHARPEN");
-		activeMoves[1] = new Move("DEFENSIVE STANCE");
-		activeMoves[2] = new Move("DOUBLE HIT");
-		activeMoves[3] = new Move("BLOCK");
+		activeMoves[0] = new Move("JAB");
+		activeMoves[1] = new Move("JAB");
+		activeMoves[2] = new Move("JAB");
+		activeMoves[3] = new Move("JAB");
 	}
 
 	public int getDamage() {

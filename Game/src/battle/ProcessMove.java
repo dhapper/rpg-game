@@ -23,8 +23,10 @@ public class ProcessMove {
 		
 		// SWAP
 		if(bs.getCurrMove().equals(Moves.SWAP)) {
+			System.out.println(bs.getEntity().getActiveSword().getFileName() + " | " + bs.getEntity().getInactiveSword().getFileName());
     		bs.getEntity().swapActiveSword();
     		bs.getEntity().loadNormalCharacterAnimations();
+    		System.out.println(bs.getEntity().getActiveSword().getFileName() + " | " + bs.getEntity().getInactiveSword().getFileName());
     	}
 		
 		// BLOCKING
@@ -83,10 +85,10 @@ public class ProcessMove {
 			
 			switch(statIndex) {
 			case ATTACK_MULTIPLIER:
-				target.getEntity().setStatColour(new Color(255, 0, 0,  20 * Math.abs(target.getStats()[ATTACK_MULTIPLIER])));
+				target.getEntity().setStatColour(new Color(255, 0, 0,  20 + 20 * Math.abs(target.getStats()[ATTACK_MULTIPLIER])));
 				break;
 			case DEFENSE_MULTIPLIER:
-				target.getEntity().setStatColour(new Color(0, 0, 255,  30 * Math.abs(target.getStats()[DEFENSE_MULTIPLIER])));
+				target.getEntity().setStatColour(new Color(0, 0, 255,  20 * Math.abs(target.getStats()[DEFENSE_MULTIPLIER])));
 				break;
 			}
 			target.getEntity().loadNormalCharacterAnimations();

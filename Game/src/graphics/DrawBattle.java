@@ -45,7 +45,7 @@ public class DrawBattle {
 		playerInfo[5] = "EVASIVENESS: "+bs.getEntity().getStats()[EVASIVENESS];
 		playerInfo[6] = "ITEM: none";
 		
-		g.setFont(GraphicsHelp.loadCustomFont(PIXEL_FONT, Game.GAME_WIDTH/50));
+		g.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, Game.GAME_WIDTH/50));
 		FontMetrics metrics = g.getFontMetrics();
 		int lineSpace = metrics.getHeight();
 		int margin = (int) (7 * Game.SCALE);
@@ -98,7 +98,7 @@ public class DrawBattle {
 	
 	private void drawPlayerBars(Graphics g, BattleState bs, int xOffset, int yOffset) {
 		int raiseString = 5;
-		g.setFont(GraphicsHelp.loadCustomFont(PIXEL_FONT, 20));
+		g.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, 20));
 		FontMetrics metrics = g.getFontMetrics();
 		String staminaStr = "stamina: "+bs.getStats()[STAMINA];
 		int textWidth = metrics.stringWidth(staminaStr);
@@ -127,7 +127,7 @@ public class DrawBattle {
 	
 	public void drawMoveErrorMessage(Graphics g, String moveErrorMessage) {
 		g.setColor(Color.RED);
-		g.setFont(GraphicsHelp.loadCustomFont(PIXEL_FONT, 20));
+		g.setFont(GraphicsHelp.LoadCustomFont(PIXEL_FONT, 20));
 		FontMetrics metrics = g.getFontMetrics();
 		int textWidth = metrics.stringWidth(moveErrorMessage);
 		g.drawString(moveErrorMessage, Game.GAME_WIDTH / 2 - textWidth / 2, Game.GAME_HEIGHT / 2);

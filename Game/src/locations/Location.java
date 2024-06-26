@@ -1,7 +1,10 @@
 package locations;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import gamestates.Overworld;
+import main.Game;
 import utilz.LoadSave;
 
 public class Location {
@@ -10,7 +13,9 @@ public class Location {
 	
 	private int locationIndex;
 	
-	public Location(int locationIndex) {
+	private ArrayList<ExitZone> exitZones;
+	
+	public Location(Overworld overworld, int locationIndex) {
 		
 		this.locationIndex = locationIndex;
 		
@@ -23,6 +28,11 @@ public class Location {
 				if(layer.contains("Lo"+locationIndex) && layer.contains(order))
 					this.addLocationLayer(layer);
 			}
+		
+		this.exitZones = new ArrayList<ExitZone>();
+		if(locationIndex == 1) {
+			exitZones.add(new ExitZone(overworld, new Rectangle(0, 0, 500, 500), 0, 1000, 100));
+		}
 		
 //		if(locationIndex == 0) {
 //			this.addLocationLayer(LoadSave.LAYER_MAP_Lo0_W_S_La1);
@@ -59,6 +69,14 @@ public class Location {
 	
 	public int getLocationIndex() {
 		return locationIndex;
+	}
+
+	public ArrayList<ExitZone> getExitZones() {
+		return exitZones;
+	}
+
+	public void setExitZones(ArrayList<ExitZone> exitZones) {
+		this.exitZones = exitZones;
 	}
 	
 
