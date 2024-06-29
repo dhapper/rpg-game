@@ -18,6 +18,7 @@ import entities.RandomEnemy;
 import graphics.Transitions;
 import locations.ExitZone;
 import locations.LocationManager;
+import locations.LocationProcessor;
 import main.Game;
 import utilz.LoadSave;
 
@@ -26,7 +27,8 @@ import static utilz.Constants.PlayerConstants.CharacterConstants.*;
 public class Overworld extends State implements Statemethods{
 
 	private Player player;
-	private LocationManager locationManager;
+	//private LocationManager locationManager;
+	private LocationProcessor locationProcessor;
 	
 	private ArrayList<NPC> characters;
 	
@@ -35,12 +37,15 @@ public class Overworld extends State implements Statemethods{
 	private int rightBorder = (int) (0.6 * Game.GAME_WIDTH);
 	private int upperBorder = (int) (0.4 * Game.GAME_HEIGHT);
 	private int lowerBorder = (int) (0.6 * Game.GAME_HEIGHT);
-	private int locationTilesWide = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1)[0].length;
-	private int locationTilesHigh = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1).length;
-	private int maxTilesOffsetX = locationTilesWide - Game.TILES_IN_WIDTH;
-	private int maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
-	private int maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
-	private int maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
+//	private int locationTilesWide = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1)[0].length;
+//	private int locationTilesHigh = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1).length;
+	
+	private int locationTilesWide;// = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1)[0].length;
+	private int locationTilesHigh;// = LoadSave.GetLocationData(LoadSave.LAYER_MAP_Lo1_W_S_La1).length;
+	private int maxTilesOffsetX;// = locationTilesWide - Game.TILES_IN_WIDTH;
+	private int maxTilesOffsetY;// = locationTilesHigh - Game.TILES_IN_HEIGHT;
+	private int maxLocationOffsetX;// = maxTilesOffsetX * Game.TILES_SIZE;
+	private int maxLocationOffsetY;// = maxTilesOffsetY * Game.TILES_SIZE;
 	
 	private LinkedList<Character> keyOrder = new LinkedList<>();
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
@@ -49,43 +54,73 @@ public class Overworld extends State implements Statemethods{
 		super(game);
 		initClasses();
 		
-		loadLocation(1);
+		locationProcessor = new LocationProcessor(this);
+		
+		//locationProcessor.getCurrentArea().setOverworldMapSize();
+		
+		loadArea(1);
+		
+//		characters = new ArrayList<NPC>();
+//		characters.add(new RandomEnemy(100, 400, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2), FACING_LEFT));
+//		characters.add(new RandomEnemy(200, 600, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2), FACING_FORWARD));
 	}
 	
-	public void loadLocation(int locationIndex) {
+	public void initMapDimensions(int tilesWide, int tilesHigh) {
+		this.locationTilesWide = tilesWide;
+		this.locationTilesHigh = tilesHigh;
+		this.maxTilesOffsetX = locationTilesWide - Game.TILES_IN_WIDTH;
+		this.maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
+		this.maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
+		this.maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
+	}
+	
+	public void loadArea(int areaIndex) {
 		
 		//create enemys here probably
-		if(locationIndex == 1) {
+		if(areaIndex == 1) {
 			characters = new ArrayList<NPC>();
 			characters.add(new RandomEnemy(100, 400, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2), FACING_LEFT));
 			characters.add(new RandomEnemy(200, 600, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2), FACING_FORWARD));
 		}
 		
 		// update visuals 
-		locationManager.setCurrentLocation(locationIndex);
-		for(int index = 0; index < locationManager.getLocations().size(); index++) {
-			if(index == locationIndex) {
-				player.clearLocationData();
-				for(String layer: LoadSave.LAYER_MAPS)
-					if(layer.contains("Lo"+index+"_") && layer.contains("_C_")) {
-						// update player collisions
-						player.addLocationData(layer);
-						// update map size
-						locationTilesWide = LoadSave.GetLocationData(layer)[0].length;
-						locationTilesHigh = LoadSave.GetLocationData(layer).length;
-					}
+		locationProcessor.setCurrentArea(areaIndex);
+		for(int index = 0; index < locationProcessor.getAreas().size(); index++) {
+			if(index == areaIndex) {
+				player.clearLocationData();			//?????????????????????????
+				//player.addLocationData(locationProcessor.getCurrentArea().getMaps().get(1));
+				player.addLocationData(locationProcessor.getCurrentArea().getMaps().get(2));
+				player.addLocationData(locationProcessor.getCurrentArea().getMaps().get(3));
+				locationProcessor.loadArea();
+				initMapDimensions(locationProcessor.getMaps().get(0)[0].length, locationProcessor.getMaps().get(0).length);
 				player.addCharacterData(characters);
-				maxTilesOffsetX = locationTilesWide - Game.TILES_IN_WIDTH;
-				maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
-				maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
-				maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
 			}
 		}
+		
+//		locationManager.setCurrentLocation(areaIndex);
+//		for(int index = 0; index < locationManager.getLocations().size(); index++) {
+//			if(index == areaIndex) {
+//				player.clearLocationData();
+//				for(String layer: LoadSave.LAYER_MAPS)
+//					if(layer.contains("Lo"+index+"_") && layer.contains("_C_")) {
+//						// update player collisions
+//						player.addLocationData(layer);
+//						// update map size
+//						locationTilesWide = LoadSave.GetLocationData(layer)[0].length;
+//						locationTilesHigh = LoadSave.GetLocationData(layer).length;
+//					}
+//				player.addCharacterData(characters);
+//				maxTilesOffsetX = locationTilesWide - Game.TILES_IN_WIDTH;
+//				maxTilesOffsetY = locationTilesHigh - Game.TILES_IN_HEIGHT;
+//				maxLocationOffsetX = maxTilesOffsetX * Game.TILES_SIZE;
+//				maxLocationOffsetY = maxTilesOffsetY * Game.TILES_SIZE;
+//			}
+//		}
 		
 	}
 
 	private void initClasses() {
-		this.locationManager = new LocationManager(this);
+		//this.locationManager = new LocationManager(this);
 		player = new Player(600, 600, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
 		
 		//enemy1 = new Enemy(300, 300, (int) (20 * Game.SCALE * 2),(int) (32 * Game.SCALE * 2));
@@ -98,7 +133,8 @@ public class Overworld extends State implements Statemethods{
 	
 	@Override
 	public void update() {
-		locationManager.update();
+		//locationManager.update();
+		locationProcessor.update();
 		player.update();
 		checkCloseToBorder();
 		
@@ -110,14 +146,14 @@ public class Overworld extends State implements Statemethods{
 		
 		
 		//if(locationManager.getCurrentLocation().getExitZones() != null) {
-			for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
-				if(player.getHitbox().intersects(ez.getZone())) {
-					enterLocation = true;
-					resetKeyOrder();
-					exitZone = ez;
-//					ez.loadNewLocation();
-				}
-			}
+//			for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
+//				if(player.getHitbox().intersects(ez.getZone())) {
+//					enterLocation = true;
+//					resetKeyOrder();
+//					exitZone = ez;
+////					ez.loadNewLocation();
+//				}
+//			}
 		//}
 		
 		
@@ -178,14 +214,15 @@ public class Overworld extends State implements Statemethods{
 	@Override
 	public void draw(Graphics g) {
 		
-		locationManager.draw(g, xLocationOffset, yLocationOffset);
+		//locationManager.draw(g, xLocationOffset, yLocationOffset);
 		//player.render(g, xLocationOffset, yLocationOffset);
 		
+		locationProcessor.draw(g, xLocationOffset, yLocationOffset);
 		
-		for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
-			g.setColor(new Color(0, 0, 255, 50));
-			g.fillRect(ez.getZone().x - xLocationOffset, ez.getZone().y - yLocationOffset, ez.getZone().width, ez.getZone().height);
-		}
+//		for(ExitZone ez : locationManager.getCurrentLocation().getExitZones()) {
+//			g.setColor(new Color(0, 0, 255, 50));
+//			g.fillRect(ez.getZone().x - xLocationOffset, ez.getZone().y - yLocationOffset, ez.getZone().width, ez.getZone().height);
+//		}
 		
 		
 		ArrayList<Entity> renderOrder = new ArrayList<Entity>();
@@ -236,6 +273,8 @@ public class Overworld extends State implements Statemethods{
         }else if(exitLocation) {
         	Transitions.openCurtains(g, xPosBlackBar);
         }
+        
+        
         
 	}
 
@@ -370,10 +409,17 @@ public class Overworld extends State implements Statemethods{
 			break;
 			
 		case KeyEvent.VK_Q:
-			if(locationManager.getCurrentLocation().getLocationIndex() == locationManager.getLocations().size() - 1)
-				loadLocation(0);
-			else
-				loadLocation(locationManager.getCurrentLocation().getLocationIndex() + 1);
+//			if(locationManager.getCurrentLocation().getLocationIndex() == locationManager.getLocations().size() - 1)
+//				loadArea(0);
+//			else
+//				loadLocation(locationManager.getCurrentLocation().getLocationIndex() + 1);
+			System.out.println("Q");
+			if(locationProcessor.getCurrentArea().getAreaIndex() == locationProcessor.getAreas().size() - 1) {
+				loadArea(0);
+			}else {
+				loadArea(locationProcessor.getCurrentArea().getAreaIndex() + 1);
+			}
+			System.out.println(locationProcessor.getCurrentArea().getAreaFileName());
 			break;
 		
 		case KeyEvent.VK_B:
@@ -433,9 +479,9 @@ public class Overworld extends State implements Statemethods{
 		return player;
 	}
 
-	public LocationManager getLocationManager() {
-		return locationManager;
-	}
+//	public LocationManager getLocationManager() {
+//		return locationManager;
+//	}
 
 	public ArrayList<NPC> getCharacters() {
 		return characters;
@@ -444,6 +490,23 @@ public class Overworld extends State implements Statemethods{
 	public void setCharacters(ArrayList<NPC> characters) {
 		this.characters = characters;
 	}
+
+	public int getLocationTilesWide() {
+		return locationTilesWide;
+	}
+
+	public void setLocationTilesWide(int locationTilesWide) {
+		this.locationTilesWide = locationTilesWide;
+	}
+
+	public int getLocationTilesHigh() {
+		return locationTilesHigh;
+	}
+
+	public void setLocationTilesHigh(int locationTilesHigh) {
+		this.locationTilesHigh = locationTilesHigh;
+	}
+	
 	
 	
 }

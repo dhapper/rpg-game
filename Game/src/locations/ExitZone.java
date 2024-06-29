@@ -21,7 +21,7 @@ public class ExitZone {
 	}
 	
 	public void loadNewLocation(){
-		overworld.loadLocation(LocationIndex);
+		overworld.loadArea(LocationIndex);
 		overworld.getPlayer().setPlayerPos(xPos, yPos);
 		
 	}

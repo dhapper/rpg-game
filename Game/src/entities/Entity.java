@@ -26,7 +26,7 @@ public abstract class Entity {
 	
 	protected BufferedImage[][] animations;
 	
-	protected Sword activeSword, inactiveSword;
+	protected Sword2 activeSword, inactiveSword;
 	protected Shield activeShield;
 	protected Armour activeArmour;
 	
@@ -49,8 +49,8 @@ public abstract class Entity {
 		
 		//initHitbox();
 
-		this.activeSword = new Sword("c", LoadSave.SWORD_WOODEN_SWORD, 10, 10);
-		this.inactiveSword = new Sword("asd", LoadSave.SWORD_IRON_SWORD, 10, 10);
+		this.activeSword = new Sword2("c", LoadSave.SWORD_WOODEN_SWORD, 10, 10);
+		this.inactiveSword = new Sword2("asd", LoadSave.SWORD_IRON_SWORD, 10, 10);
 		this.activeShield = new Shield("d", LoadSave.SHIELD_IRON_SHIELD);
 		this.activeArmour = new Armour("bas", LoadSave.ARMOUR_M_BASIC);
 	}
@@ -82,25 +82,25 @@ public abstract class Entity {
 		return animations;
 	}
 
-	public Sword getActiveSword() {
+	public Sword2 getActiveSword() {
 		return activeSword;
 	}
 
-	public void setActiveSword(Sword activeSword) {
+	public void setActiveSword(Sword2 activeSword) {
 		this.activeSword = activeSword;
 	}
 	
 	public void swapActiveSword() {
-		Sword temp = activeSword;
+		Sword2 temp = activeSword;
 		activeSword = inactiveSword;
 		inactiveSword = temp;
 	}
 	
-	public Sword getInactiveSword() {
+	public Sword2 getInactiveSword() {
 		return inactiveSword;
 	}
 
-	public void setInactiveSword(Sword inactiveSword) {
+	public void setInactiveSword(Sword2 inactiveSword) {
 		this.inactiveSword = inactiveSword;
 	}
 

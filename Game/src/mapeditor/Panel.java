@@ -1,9 +1,6 @@
-package main;
+package mapeditor;
 
 import javax.swing.JPanel;
-
-import mapeditor.KeyboardInputs;
-import mapeditor.MouseInputs;
 
 public abstract class Panel extends JPanel{
 

@@ -10,6 +10,7 @@ public class Animation {
 	
 	BufferedImage[] animation;
 	int aniTick, aniIndex, aniSpeed, rowIndex, numOfFrames;
+	String fileName;
 	
 	public Animation(String fileName, int rowIndex, int numOfFrames, int aniSpeed) {
 		this.aniTick = 0;
@@ -17,6 +18,7 @@ public class Animation {
 		this.aniSpeed = aniSpeed;
 		this.rowIndex = rowIndex;
 		this.numOfFrames = numOfFrames;
+		this.fileName = fileName;
 		this.animation = new BufferedImage[numOfFrames];
 		
 		BufferedImage spriteSheet = LoadSave.GetResource(fileName);
@@ -64,6 +66,14 @@ public class Animation {
 	
 	public int getRowIndex() {
 		return rowIndex;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 	
 }

@@ -25,8 +25,8 @@ public class Location {
 		
 		for(String order : layerOrder)
 			for(String layer : LoadSave.LAYER_MAPS) {
-				if(layer.contains("Lo"+locationIndex) && layer.contains(order))
-					this.addLocationLayer(layer);
+				if(layer.contains("Lo"+locationIndex) && layer.contains(order)) {}
+					//this.addLocationLayer(layer);
 			}
 		
 		this.exitZones = new ArrayList<ExitZone>();
@@ -51,9 +51,9 @@ public class Location {
 		
 	}
 	
-	public void addLocationLayer(String layerName) {
-		this.layers.add(LoadSave.GetLocationData(layerName));
-	}
+//	public void addLocationLayer(String layerName) {
+//		this.layers.add(LoadSave.GetLocationData(layerName));
+//	}
 	
 	public int getSpriteIndex(int layerIndex, int x, int y) {
 		return layers.get(layerIndex)[x][y];

@@ -10,7 +10,7 @@ import entities.Armour;
 import entities.Item;
 import entities.Player;
 import entities.Shield;
-import entities.Sword;
+import entities.Sword2;
 import gamestates.Inventory;
 import main.Game;
 import ui.Button;

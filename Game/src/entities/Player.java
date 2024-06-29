@@ -21,13 +21,13 @@ public class Player extends Entity {
 	private int playerAction = IDLE;
 	private boolean moving = false;
 	private boolean left, up, right, down;
-	private ArrayList<int[][]> layersData = new ArrayList<int[][]>();
+	private ArrayList<int[][]> locationData = new ArrayList<int[][]>();
 	private ArrayList<NPC> charactersData = new ArrayList<NPC>();
 
 	private int prevAni = -1;
 	private boolean facingRight = true, facingLeft = false, facingForward = false, facingBackward = false;
 
-	protected ArrayList<Sword> swords;
+	protected ArrayList<Sword2> swords;
 	protected ArrayList<Shield> shields;
 	protected ArrayList<Armour> armoury;
 	
@@ -48,18 +48,18 @@ public class Player extends Entity {
 		this.speedMultiplier = 0;
 		this.evasivenessMultiplier = 0;
 		
-		this.activeSword = new Sword("iron", LoadSave.SWORD_IRON_SWORD, 10, 10);
-		this.inactiveSword = new Sword("wooden", LoadSave.SWORD_WOODEN_SWORD, 10, 10);
+		this.activeSword = new Sword2("iron", LoadSave.SWORD_IRON_SWORD, 10, 10);
+		this.inactiveSword = new Sword2("wooden", LoadSave.SWORD_WOODEN_SWORD, 10, 10);
 		this.activeShield = new Shield("iron sh", LoadSave.SHIELD_IRON_SHIELD);
 		this.activeArmour = new Armour("bb", LoadSave.ARMOUR_M_BASIC);
 	
-		swords = new ArrayList<Sword>();
+		swords = new ArrayList<Sword2>();
 		shields = new ArrayList<Shield>();
 		armoury = new ArrayList<Armour>();
 		
 		this.swords.add(activeSword);
 		this.swords.add(inactiveSword);
-		this.swords.add(new Sword("bronze", LoadSave.SWORD_BRONZE_SWORD, 0, 0));
+		this.swords.add(new Sword2("bronze", LoadSave.SWORD_BRONZE_SWORD, 0, 0));
 		
 		this.shields.add(activeShield);
 		this.shields.add(new Shield("wooden", LoadSave.SHIELD_WOODEN_SHIELD));
@@ -189,7 +189,7 @@ public class Player extends Entity {
 			playerAction = WALKING_TOWARDS;
 		}
 		
-		if(CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, layersData, charactersData)) {
+		if(CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, locationData, charactersData)) {
 			hitbox.x += xSpeed;
 			hitbox.y += ySpeed;
 			moving = true;
@@ -214,12 +214,12 @@ public class Player extends Entity {
 		this.charactersData = characters;
 	}
 	
-	public void addLocationData(String fileName) {
-		layersData.add(LoadSave.GetLocationData(fileName));
+	public void addLocationData(int[][] mapLayer) {
+		locationData.add(mapLayer);
 	}
 	
 	public void clearLocationData() {
-		layersData.clear();
+		locationData.clear();
 	}
 	
 	public void resetDirBooleans() {
@@ -262,7 +262,7 @@ public class Player extends Entity {
 		this.down = down;
 	}
 
-	public ArrayList<Sword> getSwords() {
+	public ArrayList<Sword2> getSwords() {
 		return swords;
 	}
 

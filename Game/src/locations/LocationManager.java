@@ -33,7 +33,7 @@ public class LocationManager {
 		//System.out.println(game);
 		//System.out.println(game.getOverworld());
 		
-		locations.add(new Location(overworld, 0));
+		//locations.add(new Location(overworld, 0));
 		locations.add(new Location(overworld, 1));
 		currLocation = locations.get(1);
 	}
@@ -96,10 +96,10 @@ public class LocationManager {
 				
 				for (ArrayList<Animation> list : animationsList)
 					for(Animation anim: list) {
-						if(index4 == anim.getRowIndex() * 5 && list == animationsList.get(0))
-							g.drawImage(anim.getAnimation()[anim.getAniIndex()], i * Game.TILES_SIZE - xOffset, j * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
-						if(index5 == anim.getRowIndex() * 5 && list == animationsList.get(1))
-							g.drawImage(anim.getAnimation()[anim.getAniIndex()], i * Game.TILES_SIZE - xOffset, j * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
+//						if(index4 == anim.getRowIndex() * 5 && list == animationsList.get(0))
+//							g.drawImage(anim.getAnimation()[anim.getAniIndex()], i * Game.TILES_SIZE - xOffset, j * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
+//						if(index5 == anim.getRowIndex() * 5 && list == animationsList.get(1))
+//							g.drawImage(anim.getAnimation()[anim.getAniIndex()], i * Game.TILES_SIZE - xOffset, j * Game.TILES_SIZE - yOffset, Game.TILES_SIZE, Game.TILES_SIZE, null);
 	
 					}
 			}

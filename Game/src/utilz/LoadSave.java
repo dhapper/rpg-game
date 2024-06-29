@@ -28,6 +28,8 @@ public class LoadSave {
 	
 	public static final String HAIR_BOY_0 = "HAIR_BOY_0.png";
 	
+	public static final String SWORD_PARTS = "SWORD_PARTS_SPRITES.png";
+	
 	public static final String SWORD_BRONZE_SWORD = "SWORD_BRONZE_SWORD.png";
 	public static final String SWORD_IRON_SWORD = "SWORD_IRON_SWORD.png";
 	public static final String SWORD_WOODEN_SWORD = "SWORD_WOODEN_SWORD.png";
@@ -74,6 +76,9 @@ public class LoadSave {
         //LAYER_MAPS.add(LAYER_MAP_Lo1_C_S_La2);
     }
 
+	public static final String SPRITESHEET_BASE = "SPRITESHEET_BASE.png";
+	public static final String SPRITESHEET_OVERLAP = "SPRITESHEET_OVERLAP.png";
+	
 	public static final String SPRITESHEET_W_S_La1 = "SPRITESHEET_W_S_La1.png";
 	public static final String SPRITESHEET_W_S_La2 = "SPRITESHEET_W_S_La2.png";
 	public static final String SPRITESHEET_C_S_La1 = "SPRITESHEET_C_S_La1.png";
@@ -105,22 +110,22 @@ public class LoadSave {
 		return sprite;
 	}
 	
-	public static int[][] GetLocationData(String data){
-		int numOfSprites = 25;
-		
-		BufferedImage img = GetResource(data);
-		int [][] locationData = new int[img.getHeight()][img.getWidth()];
-		
-		for(int j = 0 ; j < img.getHeight(); j ++) {
-			for(int i = 0 ; i < img.getWidth(); i++) {
-				Color color = new Color(img.getRGB(i, j));
-				int value = color.getRed();
-				if(value >= numOfSprites)
-					value = 0;
-				locationData[j][i] = value;
-			}
-		}
-		return locationData;
-	}
+//	public static int[][] GetLocationData(String data){
+//		int numOfSprites = 25;
+//		
+//		BufferedImage img = GetResource(data);
+//		int [][] locationData = new int[img.getHeight()][img.getWidth()];
+//		
+//		for(int j = 0 ; j < img.getHeight(); j ++) {
+//			for(int i = 0 ; i < img.getWidth(); i++) {
+//				Color color = new Color(img.getRGB(i, j));
+//				int value = color.getRed();
+//				if(value >= numOfSprites)
+//					value = 0;
+//				locationData[j][i] = value;
+//			}
+//		}
+//		return locationData;
+//	}
 	
 }

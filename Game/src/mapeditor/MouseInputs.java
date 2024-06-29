@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 
 import gamestates.GameState;
 import main.GamePanel;
-import main.Panel;
 
 public class MouseInputs implements MouseListener, MouseMotionListener{
 
@@ -21,12 +20,27 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		
+		Tile[][] tiles = MapEditor.GetTiles(SpritePanel.LAYER);
+			
 		int x = e.getX() / MapEditor.TILE_SIZE;
 		int y = e.getY() / MapEditor.TILE_SIZE;
 		
 		if (panel instanceof MapPanel) {
 			
-            MapEditor.TILES[y][x].changeSprite(SpritePanel.SPRITE_CHOICE);
+			if(x > MapEditor.WIDTH - 1 || x < 0)
+				return;
+			
+			if(y > MapEditor.HEIGHT - 1 || y < 0)
+				return;
+			
+			if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) { // Check if the right mouse button is being dragged
+				tiles[y][x].resetTile();
+				panel.repaint();
+	            return;
+	        }
+			
+            tiles[y][x].changeSprite(SpritePanel.SPRITE_CHOICE);
             
             panel.repaint();
         }
@@ -45,26 +59,87 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 	@Override
 	public void mousePressed(MouseEvent e) {
 		
-		//mousePressed = true;
+		Tile[][] tiles = MapEditor.GetTiles(SpritePanel.LAYER);
+		
+		if(e.getX() < 0 || e.getX() > MapEditor.WIDTH * 32)
+			return;
+		
+		if(e.getY() < 0 || e.getY() > MapEditor.HEIGHT * 32)
+			return;
 		
 		
 		int x = e.getX() / MapEditor.TILE_SIZE;
 		int y = e.getY() / MapEditor.TILE_SIZE;
 		
-		int spriteID = MapEditor.TILES[y][x].getSpriteID();
+		int spriteID = tiles[y][x].getSpriteID();
+		
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			tiles[y][x].resetTile();
+			panel.repaint();
+            return;
+        }
+		
+		if(KeyboardInputs.keyHeld) {
+			if (KeyboardInputs.key == 's' || KeyboardInputs.key == 'S') {
+				if(SaveMap.IsMapValid(MapEditor.GetTiles(1)))
+					new NameMapWindow();
+					//SaveMap.WriteToFile(MapEditor.TILE_LAYERS);
+			return;	
+			}
+		}
+		
+		if(KeyboardInputs.keyHeld) {
+			switch (KeyboardInputs.key) {
+			case '1':
+				SpritePanel.LAYER = 1;
+				break;
+			case '2':
+				SpritePanel.LAYER = 2;
+				break;
+			case '3':
+				SpritePanel.LAYER = 3;
+				break;
+			case '4':
+				SpritePanel.LAYER = 4;
+				break;
+			case '5':
+				SpritePanel.LAYER = 5;
+				break;
+			}
+			panel.repaint();
+		}
+		
+//		if(KeyboardInputs.keyHeld) {
+//			if (KeyboardInputs.key == '1') {
+//				SpritePanel.LAYER = 1;
+//			}else if(KeyboardInputs.key == '2') {
+//				SpritePanel.LAYER = 2;
+//			}
+//			panel.repaint();
+//		}
 		
 		if (panel instanceof MapPanel) {
-            MapEditor.TILES[y][x].changeSprite(SpritePanel.SPRITE_CHOICE);
+			tiles[y][x].changeSprite(SpritePanel.SPRITE_CHOICE);
         }else if(panel instanceof SpritePanel) {
-            ((SpritePanel) panel).setSpriteChoice(x + 5*y);
+        	
+        	switch(SpritePanel.LAYER) {
+        	case 1:
+			case 2:
+				((SpritePanel) panel).setSpriteChoice(x + 6*y);
+				break;
+			case 3:
+			case 4:
+			case 5:
+				((SpritePanel) panel).setSpriteChoice(x + 5*y);
+				break;
+        	}
 		}
 		
 		if(KeyboardInputs.keyHeld) {
 			if (KeyboardInputs.key == 'b' || KeyboardInputs.key == 'B') {
-				BufferedImage sprite = new SpriteSheet().getSprite(SpritePanel.SPRITE_CHOICE);
-				for(int i = 0; i < MapEditor.TILES.length; i ++) {
-					for(int j = 0; j < MapEditor.TILES[0].length; j ++) {
-						MapEditor.TILES[i][j].setImage(sprite); 
+				for(int i = 0; i < tiles.length; i ++) {
+					for(int j = 0; j < tiles[0].length; j ++) {
+						tiles[i][j].changeSprite(SpritePanel.SPRITE_CHOICE); 
 					}
 				}
 		    }
@@ -72,26 +147,16 @@ public class MouseInputs implements MouseListener, MouseMotionListener{
 		
 		if(KeyboardInputs.keyHeld) {
 			if (KeyboardInputs.key == 'c' || KeyboardInputs.key == 'C') {
-				BufferedImage sprite = new SpriteSheet().getSprite(SpritePanel.SPRITE_CHOICE);
-				System.out.println(spriteID);
-				for(int i = 0; i < MapEditor.TILES.length; i ++) {
-					for(int j = 0; j < MapEditor.TILES[0].length; j ++) {
-						if(MapEditor.TILES[i][j].getSpriteID() == spriteID)
-							MapEditor.TILES[i][j].setImage(sprite); 
-						System.out.print(MapEditor.TILES[i][j].getSpriteID() + " ");
+				for(int i = 0; i < tiles.length; i ++) {
+					for(int j = 0; j < tiles[0].length; j ++) {
+						if(tiles[i][j].getSpriteID() == spriteID)
+							tiles[i][j].changeSprite(SpritePanel.SPRITE_CHOICE); 
 					}
-					System.out.println();
 				}
 		    }
 		}
 		
 		panel.repaint();
-		
-		if(KeyboardInputs.keyHeld) {
-			if (KeyboardInputs.key == 's' || KeyboardInputs.key == 'S') {
-				SaveMap.WriteToFile(MapEditor.TILES);
-			}
-		}
 		
 	}
 

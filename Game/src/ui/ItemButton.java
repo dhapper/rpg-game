@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 import entities.Entity;
 import entities.Item;
 import entities.Player;
-import entities.Sword;
+import entities.Sword2;
 import graphics.GraphicsHelp;
 import utilz.LoadSave;
 

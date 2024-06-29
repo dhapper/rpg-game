@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import battle.Move;
 
-public class Sword extends Item{
+public class Sword2 extends Item{
 
 	private int damage;
 	private int speed;
@@ -12,7 +12,7 @@ public class Sword extends Item{
 	private Move[] activeMoves;
 	private ArrayList<Move> moveset;
 	
-	public Sword(String name, String fileName, int damage, int speed) {
+	public Sword2(String name, String fileName, int damage, int speed) {
 		this.name = name;
 		this.damage = 10;
 		this.speed = 10;

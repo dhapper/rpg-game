@@ -6,8 +6,6 @@ import java.awt.GridLayout;
 
 import javax.swing.JPanel;
 
-import main.Panel;
-
 public class MapPanel extends Panel{
 
 	public boolean test = true;
@@ -23,9 +21,17 @@ public class MapPanel extends Panel{
 	public void paintComponent(Graphics g) {
 	    super.paintComponent(g);
 	    
-	    for(int i = 0; i < MapEditor.TILES.length; i ++) {
-			for(int j = 0; j < MapEditor.TILES[0].length; j ++) {
-				g.drawImage(MapEditor.TILES[i][j].getImage(), j * MapEditor.TILE_SIZE, i * MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, null);
+	    for(int i = 0; i < MapEditor.TILE_LAYERS.get(0).length; i ++) {
+			for(int j = 0; j < MapEditor.TILE_LAYERS.get(0)[0].length; j ++) {
+				g.drawImage(MapEditor.TILE_LAYERS.get(0)[i][j].getImage(), j * MapEditor.TILE_SIZE, i * MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, null);
+				
+				g.drawImage(MapEditor.TILE_LAYERS.get(3)[i][j].getImage(), j * MapEditor.TILE_SIZE, i * MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, null);
+				
+				g.drawImage(MapEditor.TILE_LAYERS.get(1)[i][j].getImage(), j * MapEditor.TILE_SIZE, i * MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, null);
+				
+				g.drawImage(MapEditor.TILE_LAYERS.get(2)[i][j].getImage(), j * MapEditor.TILE_SIZE, i * MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, null);
+				
+				g.drawImage(MapEditor.TILE_LAYERS.get(4)[i][j].getImage(), j * MapEditor.TILE_SIZE, i * MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, MapEditor.TILE_SIZE, null);
 			}
 		}
 	}

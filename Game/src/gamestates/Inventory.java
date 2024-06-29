@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import entities.Armour;
 import entities.Player;
 import entities.Shield;
-import entities.Sword;
+import entities.Sword2;
 import graphics.DrawInventoryUI;
 import main.Game;
 import ui.BackButton;
@@ -80,7 +80,7 @@ public class Inventory extends State implements Statemethods{
 	    for (T item : items) {
 	    	switch(itemType) {
 	    	case SWORD:
-	    		itemButtons.add(new ItemButton(X_OFFSET_ITEM_BUTTON + X_GAP * col, Game.GAME_HEIGHT * row / 4 - B_HEIGHT / 2, player, (Sword) item, itemType, index));
+	    		itemButtons.add(new ItemButton(X_OFFSET_ITEM_BUTTON + X_GAP * col, Game.GAME_HEIGHT * row / 4 - B_HEIGHT / 2, player, (Sword2) item, itemType, index));
 	    		break;
 	    	case SHIELD:
 	    		itemButtons.add(new ItemButton(X_OFFSET_ITEM_BUTTON + X_GAP * col, Game.GAME_HEIGHT * row / 4 - B_HEIGHT / 2, player, (Shield) item, itemType, index));
@@ -189,7 +189,7 @@ public class Inventory extends State implements Statemethods{
 					if(ib.getItem().equals(player.getActiveSword()) || ib.getItem().equals(player.getInactiveSword())) {
 						player.swapActiveSword();
 					}else {
-						player.setActiveSword((Sword)ib.getItem());
+						player.setActiveSword((Sword2)ib.getItem());
 						player.loadAnimations();
 					}
 				break;

@@ -22,7 +22,7 @@ import battle.MoveMethods;
 import entities.Enemy;
 import entities.Entity;
 import entities.RandomEnemy;
-import entities.Sword;
+import entities.Sword2;
 import graphics.DrawBattle;
 import graphics.GraphicsHelp;
 import graphics.Transitions;
